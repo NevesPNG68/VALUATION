@@ -305,6 +305,27 @@ html, body { width:100%; overflow-x:hidden; }
   .navbtn{ min-width:84px; }
 }
 
+
+/* ===== Mobile portrait viewport + safe scroll (v7) ===== */
+:root{ --navH: 86px; } /* fallback */
+.app{ height:100dvh; min-height:100dvh; }
+@supports (height: 100svh){
+  .app{ height:100svh; min-height:100svh; } /* iOS Safari stable viewport */
+}
+@supports (height: 100lvh){
+  .app{ height:100lvh; min-height:100lvh; } /* large viewport */
+}
+/* main needs bottom padding so content isn't hidden behind bottom nav */
+.main{ padding-bottom: calc(14px + var(--navH) + env(safe-area-inset-bottom)); }
+/* ensure main always scrolls in portrait */
+.main{ overflow-y:auto; -webkit-overflow-scrolling:touch; }
+body{ overscroll-behavior-y: contain; }
+@media (max-width: 520px){
+  .nav{ position:sticky; bottom:0; z-index:45; }
+  .navrow{ padding-bottom: 4px; }
+  .navbtn{ min-width:78px; }
+}
+
 </style>
 </head>
 <body>
@@ -1382,6 +1403,19 @@ document.getElementById("backdrop").onclick=()=>openDrawer(false);
 document.getElementById("sheetClose").onclick=closeYearPicker;
 document.getElementById("sheetBack").onclick=closeYearPicker;
 render();
+
+// ===== v7: dynamic bottom-nav height (avoid hidden content in portrait) =====
+function setNavHeightVar(){
+  try{
+    const nav=document.querySelector(".nav");
+    const h = nav ? nav.getBoundingClientRect().height : 86;
+    document.documentElement.style.setProperty("--navH", Math.ceil(h)+"px");
+  }catch(e){}
+}
+window.addEventListener("resize", setNavHeightVar);
+window.addEventListener("orientationchange", setNavHeightVar);
+setTimeout(setNavHeightVar, 0);
+
 </script>
 </body>
 </html>
