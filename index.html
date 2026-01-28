@@ -294,6 +294,17 @@ input.inp:focus{
   background:linear-gradient(135deg, rgba(94,234,212,.14), rgba(96,165,250,.10));
 }
 
+
+/* ===== Portrait-first mobile fix (v6) ===== */
+html, body { width:100%; overflow-x:hidden; }
+.main{ overflow-x:hidden; }
+@media (max-width: 520px){
+  .table{ overflow-x:hidden; } /* prefer cards instead of horizontal scroll */
+  .table table{ min-width:0 !important; width:100% !important; }
+  .table th, .table td{ white-space:normal; }
+  .navbtn{ min-width:84px; }
+}
+
 </style>
 </head>
 <body>
@@ -898,6 +909,80 @@ function renderCOMPS(){
     };
   },0);
 
+
+  const isMobileComps = window.matchMedia && window.matchMedia("(max-width: 520px)").matches;
+
+  // Mobile (vertical): editor por cards (sem tabela larga)
+  if(isMobileComps){
+    const list=card("Comparáveis (cards)", "Modo mobile • editar por cartão");
+    const wrap=document.createElement("div"); wrap.className="fields";
+    const note=document.createElement("div"); note.className="helper";
+    note.textContent="Dica: adicione comparáveis e preencha os campos. O K é calculado automaticamente.";
+    list.body.appendChild(note);
+
+    function inputLine(lbl, value, onBlur, opts={}){
+      const w=document.createElement("div"); w.className="field";
+      w.innerHTML='<div class="label"><span>'+escapeHtml(lbl)+'</span></div>';
+      const i=document.createElement("input"); i.className="inp"; i.style.height="40px";
+      i.value = (value==null) ? "" : String(value);
+      if(opts.list) i.setAttribute("list", opts.list);
+      if(opts.placeholder) i.placeholder = opts.placeholder;
+      i.addEventListener("blur", ()=>onBlur(i.value, i));
+      w.appendChild(i); 
+      return {w,i};
+    }
+
+    state.comps.forEach((c, idx)=>{
+      const r=computeComp(c);
+      const tc=document.createElement("div"); tc.className="tcard";
+      tc.style.padding="12px";
+      tc.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">'
+        + '<div style="font-weight:980">Comp #'+escapeHtml(String(c.id??(idx+1)))+'</div>'
+        + '<button class="btn bad" style="padding:8px 10px;border-radius:12px;font-size:11px" data-del="'+idx+'">Remover</button>'
+        + '</div>';
+
+      const grid=document.createElement("div"); grid.className="fields";
+
+      const rua = inputLine("Rua", c.rua||"", (v)=>{ c.rua=v; saveLocal(); render(); }, {list:"ruasList", placeholder:"Digite…"}); grid.appendChild(rua.w);
+      const at  = inputLine("Área terreno (m²)", c.area_terreno??"", (v,el)=>{ c.area_terreno=parseBR(v); saveLocal(); render(); }, {placeholder:"Ex.: 375"}); grid.appendChild(at.w);
+      const ac  = inputLine("Área construída (m²)", c.area_construida??"", (v)=>{ c.area_construida=parseBR(v); saveLocal(); render(); }, {placeholder:"Ex.: 0"}); grid.appendChild(ac.w);
+      const uso = inputLine("Uso", c.uso||"", (v)=>{ c.uso=v; saveLocal(); render(); }, {list:"usoList"}); grid.appendChild(uso.w);
+      const est = inputLine("Estrutura", c.estrutura||"", (v)=>{ c.estrutura=v; saveLocal(); render(); }, {list:"estruturaList"}); grid.appendChild(est.w);
+      const eco = inputLine("Estado", c.estado||"", (v)=>{ c.estado=v; saveLocal(); render(); }, {list:"estadoList"}); grid.appendChild(eco.w);
+      const z   = inputLine("Fz (nº)", c.zone||"", (v)=>{ c.zone=v; saveLocal(); render(); }, {list:"zoneList"}); grid.appendChild(z.w);
+      const pr  = inputLine("Preço (R$)", c.preco!=null?money(c.preco):"", (v,el)=>{ const n=parseBR(v); c.preco=n; el.value=(n==null)?"":money(n); saveLocal(); render(); }, {placeholder:"R$ 300.000,00"}); grid.appendChild(pr.w);
+
+      tc.appendChild(grid);
+
+      // resultados
+      const res=document.createElement("div");
+      res.style.marginTop="10px";
+      res.innerHTML =
+        '<div class="trow"><div class="tk">Fator Loc.</div><div class="tv mono">'+(r.fatorLoc??"—")+'</div></div>'+
+        '<div class="trow"><div class="tk">Venal Total</div><div class="tv mono">'+(r.venalTotal!=null?money(r.venalTotal):"—")+'</div></div>'+
+        '<div class="trow"><div class="tk">K</div><div class="tv mono">'+(r.k!=null?num2(r.k):"—")+'</div></div>';
+      tc.appendChild(res);
+
+      wrap.appendChild(tc);
+    });
+
+    list.body.appendChild(wrap);
+
+    // deletar
+    setTimeout(()=>{
+      list.c.querySelectorAll("[data-del]").forEach(btn=>{
+        btn.onclick=()=>{
+          const i=parseInt(btn.getAttribute("data-del"),10);
+          if(Number.isFinite(i)){ state.comps.splice(i,1); saveLocal(); showToast("Comparável removido."); render(); }
+        };
+      });
+    },0);
+
+    main.appendChild(list.c);
+    return;
+  }
+
+
   const table=card("Tabela (editável)", "Aba MERCADO_COMPS");
   const wrap=document.createElement("div"); wrap.className="table";
   const tbl=document.createElement("table");
@@ -1043,7 +1128,29 @@ function renderPROJ_TABLE(host){
 
   if(c.mercadoEst==null) return;
 
-  const wrap=document.createElement("div"); wrap.className="table cardmode";
+  const isMobile = window.matchMedia && window.matchMedia("(max-width: 520px)").matches;
+
+  if(isMobile){
+    const wrap=document.createElement("div"); wrap.className="table cardmode";
+    const cards=document.createElement("div"); cards.className="tableCards";
+    p.rows.slice(0,31).forEach(r=>{
+      const tc=document.createElement("div"); tc.className="tcard";
+      tc.innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">'+
+          '<div style="font-weight:980;font-size:12px;">Ano '+r.ano+'</div>'+
+          '<div class="badge" style="font-size:10px;">3 cenários</div>'+
+        '</div>'+
+        '<div class="trow"><div class="tk">Baixo</div><div class="tv mono">'+money(r.baixo)+'</div></div>'+
+        '<div class="trow"><div class="tk">Base</div><div class="tv mono">'+money(r.base)+'</div></div>'+
+        '<div class="trow"><div class="tk">Alto</div><div class="tv mono">'+money(r.alto)+'</div></div>';
+      cards.appendChild(tc);
+    });
+    wrap.appendChild(cards);
+    host.appendChild(wrap);
+    return;
+  }
+
+  const wrap=document.createElement("div"); wrap.className="table";
   const tbl=document.createElement("table");
   tbl.innerHTML="<thead><tr><th class='mono'>Ano</th><th class='mono'>Valor BAIXO</th><th class='mono'>Valor BASE</th><th class='mono'>Valor ALTO</th></tr></thead><tbody></tbody>";
   const tb=tbl.querySelector("tbody");
@@ -1053,23 +1160,6 @@ function renderPROJ_TABLE(host){
     tb.appendChild(tr);
   });
   wrap.appendChild(tbl);
-
-  // Mobile cards — projeção (0–30)
-  const cards=document.createElement("div"); cards.className="tableCards";
-  p.rows.slice(0,31).forEach(r=>{
-    const tc=document.createElement("div"); tc.className="tcard";
-    tc.innerHTML =
-      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">' +
-        '<div style="font-weight:980;font-size:12px;">Ano '+r.ano+'</div>' +
-        '<div class="badge ok">BASE</div>' +
-      '</div>' +
-      '<div class="trow"><div class="tk">Baixo</div><div class="tv mono">'+money(r.baixo)+'</div></div>' +
-      '<div class="trow"><div class="tk">Base</div><div class="tv mono">'+money(r.base)+'</div></div>' +
-      '<div class="trow"><div class="tk">Alto</div><div class="tv mono">'+money(r.alto)+'</div></div>';
-    cards.appendChild(tc);
-  });
-  wrap.appendChild(cards);
-
   host.appendChild(wrap);
 }
 
