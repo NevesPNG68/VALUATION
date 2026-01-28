@@ -184,6 +184,116 @@ input.inp[disabled]{opacity:.75}
 }
 .nbtn.active{border-color:rgba(94,234,212,.35); background:rgba(94,234,212,.10)}
 
+
+/* ===== Mobile-first App UI (v13) ===== */
+:root{
+  --accent2:#60a5fa;
+  --glass:rgba(8,10,16,.72);
+  --card:rgba(255,255,255,.035);
+}
+body{ overscroll-behavior: none; }
+.topbar{ position:sticky; top:0; z-index:40; }
+.nav{ position:sticky; bottom:0; z-index:40; }
+.fadeIn{animation:fadeIn .14s ease both}
+@keyframes fadeIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:translateY(0)}}
+@media (max-width: 520px){
+  .topbar{padding:12px 12px 10px; background:rgba(8,10,16,.78);}
+  .logo{
+    background:linear-gradient(135deg, rgba(94,234,212,.22), rgba(96,165,250,.18), rgba(251,191,36,.12));
+  }
+  .title{font-size:14px}
+  .subtitle{font-size:12px}
+  .hero{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02))}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.02))}
+  .fields{grid-template-columns:1fr !important}
+  .grid3{grid-template-columns:1fr !important}
+  .btnrow{gap:8px}
+  .btn{padding:11px 12px; border-radius:14px}
+  .navrow{gap:8px}
+  .navbtn{min-width:76px}
+  .navbtn .ico{width:22px;height:22px;border-radius:10px;background:rgba(255,255,255,.04)}
+  .navbtn .ico svg{width:18px;height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .navbtn.active .ico{background:rgba(94,234,212,.12); border-color:rgba(94,234,212,.35)}
+  .navbtn.active{box-shadow:0 10px 26px rgba(0,0,0,.35)}
+}
+/* Card-mode tables (mobile) */
+@media (max-width: 520px){
+  .table.cardmode table{display:none;}
+  .tableCards{display:grid; gap:10px; padding:10px;}
+  .tcard{border:1px solid var(--border); background:var(--card); border-radius:16px; padding:10px; box-shadow:0 10px 26px rgba(0,0,0,.35);}
+  .trow{display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,.10);}
+  .trow:last-child{border-bottom:none}
+  .tk{color:var(--muted); font-size:10.5px; font-weight:950}
+  .tv{font-size:12px; font-weight:980; text-align:right; max-width:62%; word-break:break-word}
+}
+
+
+/* ===== Dashboard mobile vertical fix (v3) ===== */
+@media (max-width: 520px){
+  .dashGrid{grid-template-columns:1fr !important;}
+  .dashSticky{position:static !important;}
+  .dashRightBody{max-height:none !important; overflow:visible !important;}
+  .dashRightScroll{max-height:none !important; overflow:visible !important; border-radius:16px;}
+  /* compact "Principais" */
+  .dashCompact .grid3{gap:8px}
+  .dashCompact .field .inp{height:38px; border-radius:12px; font-size:11.5px}
+}
+/* Desktop: left smaller */
+@media (min-width: 920px){
+  .dashGrid{grid-template-columns: .85fr 1.35fr !important;}
+}
+
+
+/* ===== Modern icon treatment ===== */
+.navbtn .ico{
+  border:1px solid rgba(255,255,255,.10);
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  box-shadow:0 10px 26px rgba(0,0,0,.28);
+}
+.navbtn.active .ico{
+  border-color:rgba(94,234,212,.45);
+  background:linear-gradient(135deg, rgba(94,234,212,.18), rgba(96,165,250,.16), rgba(251,191,36,.10));
+  box-shadow:0 14px 34px rgba(0,0,0,.38);
+}
+.navbtn.active{transform:translateY(-1px);}
+
+
+/* ===== Premium cards & inputs (v5) ===== */
+.card{
+  background:
+    radial-gradient(900px 280px at 20% 0%, rgba(94,234,212,.10), transparent 55%),
+    radial-gradient(900px 280px at 85% 10%, rgba(96,165,250,.10), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.02));
+}
+.cardbar{
+  background:
+    linear-gradient(180deg, rgba(12,16,32,.70), rgba(12,16,32,.45));
+}
+.hero{
+  background:
+    radial-gradient(900px 320px at 20% 0%, rgba(94,234,212,.12), transparent 60%),
+    radial-gradient(900px 320px at 85% 10%, rgba(251,191,36,.10), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+}
+input.inp{
+  border:1px solid rgba(255,255,255,.12);
+  background:
+    radial-gradient(500px 140px at 30% 0%, rgba(94,234,212,.06), transparent 60%),
+    rgba(255,255,255,.03);
+}
+input.inp:focus{
+  border-color:rgba(96,165,250,.60);
+  box-shadow:0 0 0 3px rgba(96,165,250,.14);
+}
+.btn.primary{
+  background:linear-gradient(135deg, rgba(94,234,212,.18), rgba(96,165,250,.16));
+  border-color:rgba(96,165,250,.45);
+}
+.badge.ok{
+  border-color:rgba(94,234,212,.40);
+  background:linear-gradient(135deg, rgba(94,234,212,.14), rgba(96,165,250,.10));
+}
+
 </style>
 </head>
 <body>
@@ -268,6 +378,57 @@ function showToast(msg){
   showToast._t=setTimeout(()=>t.style.display="none", 2400);
 }
 
+/* ===== Icons (inline SVG) ===== */
+const ICONS = {
+  base: `<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 19a2 2 0 0 0 2 2h12"/>
+    <path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/>
+    <path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h6"/>
+  </svg>`,
+  home: `<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/>
+    <path d="M9 20v-7h6v7"/>
+  </svg>`,
+  comps: `<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 3h8a2 2 0 0 1 2 2v4H6V5a2 2 0 0 1 2-2z"/>
+    <path d="M6 13h5v8H6z"/><path d="M13 13h5v8h-5z"/>
+    <path d="M12 9v4"/>
+  </svg>`,
+  sliders: `<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 21v-8"/><path d="M4 9V3"/>
+    <path d="M12 21v-6"/><path d="M12 12V3"/>
+    <path d="M20 21v-10"/><path d="M20 9V3"/>
+    <path d="M2 9h4"/><path d="M10 15h4"/><path d="M18 11h4"/>
+  </svg>`,
+  valuation: `<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3v18"/><path d="M7 7h7a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h8"/>
+  </svg>`,
+  projection: `<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 17l6-6 4 4 7-9"/><path d="M14 6h6v6"/>
+    <path d="M3 21h18"/>
+  </svg>`,
+  settings: `<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+    <path d="M19.4 15a7.9 7.9 0 0 0 .1-2l2-1.6-2-3.4-2.4 1a7.7 7.7 0 0 0-1.7-1L15 3h-6l-.4 3a7.7 7.7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7.9 7.9 0 0 0 .1 2l-2 1.6 2 3.4 2.4-1a7.7 7.7 0 0 0 1.7 1L9 21h6l.4-3a7.7 7.7 0 0 0 1.7-1l2.4 1 2-3.4z"/>
+  </svg>`,
+  dashboard: `<svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 13a8 8 0 1 1 16 0"/><path d="M12 13l3-3"/>
+    <path d="M5 21h14"/>
+  </svg>`
+};
+
+
+const TAB_ICON = {
+  BASE_TABELAS:"base",
+  INPUT_IMOVEL:"home",
+  MERCADO_COMPS:"comps",
+  CALIBRACAO_K:"sliders",
+  VALUATION_ATUAL:"chart",
+  PREMISSAS:"settings",
+  PROJECAO:"chart",
+  DASHBOARD:"check"
+};
+
 const STORAGE_KEY="valuation_app_state_v7";
 const state={ tab:"INPUT_IMOVEL", edits:{}, comps:[] };
 function loadLocal(){ try{ const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return; const obj=JSON.parse(raw); if(obj){ state.tab=obj.tab||state.tab; state.edits=obj.edits||state.edits; state.comps=Array.isArray(obj.comps)?obj.comps:state.comps; } }catch(e){} }
@@ -292,7 +453,8 @@ function resetInputImovel(){
 function setSubtitle(){
   const el=document.getElementById("subinfo");
   const d=new Date(window.APP_DATA.generated_at);
-  el.textContent="Fonte: "+window.APP_DATA.workbook+" • "+d.toLocaleString("pt-BR");
+  const when=d.toLocaleString("pt-BR");
+  el.textContent = "Desenvolvido por Renato Neves • Fonte: " + window.APP_DATA.workbook + " • " + when;
 }
 
 const T=window.APP_DATA.tables;
@@ -350,14 +512,14 @@ const FLOW=[
   {id:"DASHBOARD", label:"6) Dashboard"},
 ];
 const BOTTOM=[
-  {id:"BASE_TABELAS", icon:"📚", label:"Base"},
-  {id:"INPUT_IMOVEL", icon:"🏠", label:"Imóvel"},
-  {id:"MERCADO_COMPS", icon:"🧾", label:"Comps"},
-  {id:"CALIBRACAO_K", icon:"🎛️", label:"K"},
-  {id:"VALUATION_ATUAL", icon:"📊", label:"Valor"},
-  {id:"PREMISSAS", icon:"⚙️", label:"Premissas"},
-  {id:"PROJECAO", icon:"📈", label:"Projeção"},
-  {id:"DASHBOARD", icon:"✅", label:"Dash"},
+  {id:"BASE_TABELAS", iconKey:"base", label:"Base"},
+  {id:"INPUT_IMOVEL", iconKey:"home", label:"Imóvel"},
+  {id:"MERCADO_COMPS", iconKey:"comps", label:"Comps"},
+  {id:"CALIBRACAO_K", iconKey:"sliders", label:"K"},
+  {id:"VALUATION_ATUAL", iconKey:"valuation", label:"Valor"},
+  {id:"PREMISSAS", iconKey:"settings", label:"Premissas"},
+  {id:"PROJECAO", iconKey:"projection", label:"Projeção"},
+  {id:"DASHBOARD", iconKey:"dashboard", label:"Dashboard"},
 ];
 
 function openDrawer(open){
@@ -372,7 +534,16 @@ function renderDrawer(){
   TABS.forEach(t=>{
     const d=document.createElement("div");
     d.className="menuItem"+(state.tab===t.id?" active":"");
-    d.innerHTML='<div class="t">'+escapeHtml(t.title)+'</div><div class="s">'+escapeHtml(t.subtitle)+'</div>';
+    const k = TAB_ICON[t.id] || "info";
+    const svg = (ICONS[k]||"").replace('<svg','<svg style="width:18px;height:18px;"');
+    d.innerHTML =
+      '<div style="display:flex;gap:10px;align-items:flex-start;">' +
+        '<div style="width:34px;height:34px;border-radius:14px;border:1px solid var(--border);background:rgba(255,255,255,.03);display:grid;place-items:center;">'+svg+'</div>' +
+        '<div style="min-width:0;">' +
+          '<div class="t">'+escapeHtml(t.title)+'</div>' +
+          '<div class="s">'+escapeHtml(t.subtitle)+'</div>' +
+        '</div>' +
+      '</div>';
     d.onclick=()=>{ state.tab=t.id; saveLocal(); openDrawer(false); render(); };
     body.appendChild(d);
   });
@@ -394,21 +565,24 @@ function renderBottom(){
   BOTTOM.forEach(s=>{
     const b=document.createElement("button");
     b.className="navbtn"+(state.tab===s.id?" active":"");
-    b.innerHTML='<div class="ico">'+s.icon+'</div><div>'+s.label+'</div>';
+    const svg = (typeof ICONS!=='undefined' && ICONS[s.iconKey]) ? ICONS[s.iconKey] : "";
+    b.innerHTML='<div class="ico">'+svg+'</div><div>'+s.label+'</div>';
     b.onclick=()=>{ state.tab=s.id; saveLocal(); render(); };
     row.appendChild(b);
   });
 }
 
-function hero(title, desc){
+function hero(title, desc, iconKey){
   const h=document.createElement("div");
-  h.className="hero";
-  h.innerHTML='<h1>'+escapeHtml(title)+'</h1><p>'+escapeHtml(desc)+'</p>';
+  h.className="hero fadeIn";
+  const svg = iconKey ? (ICONS[iconKey]||"") : "";
+  const icon = svg ? ('<span style="display:inline-grid;place-items:center;width:28px;height:28px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.03);margin-right:10px;">'+svg.replace('<svg','<svg style="width:16px;height:16px;"')+'</span>') : "";
+  h.innerHTML='<div style="display:flex;align-items:flex-start;"><div>'+icon+'</div><div><h1 style="margin:0">'+escapeHtml(title)+'</h1><p style="margin:6px 0 0; color:var(--muted); font-size:12px; line-height:1.35">'+escapeHtml(desc)+'</p></div></div>';
   const row=document.createElement("div");
   row.className="btnrow";
   row.innerHTML='<button class="btn warn" id="bres">Resetar tudo</button>';
   h.appendChild(row);
-  setTimeout(()=>{ document.getElementById("bres").onclick=resetAll; },0);
+  setTimeout(()=>{ const btn=document.getElementById("bres"); if(btn) btn.onclick=resetAll; },0);
   return h;
 }
 function card(title, meta){
@@ -598,7 +772,7 @@ function projectionSeries(){
 function renderBASE(){
   const main=document.getElementById("main");
   main.innerHTML="";
-  main.appendChild(hero("BASE_TABELAS", "Lista completa de ruas (com busca). Toque em uma rua para preencher o INPUT_IMOVEL automaticamente."));
+  main.appendChild(hero("BASE_TABELAS","Lista completa de ruas (com busca). Toque em uma rua para preencher o INPUT_IMOVEL automaticamente.","base"));
   const c=card("Ruas", streets.length+" registros");
   const g=document.createElement("div"); g.className="fields";
   g.appendChild(fieldText("Buscar rua", "base.search", "Ex.: Pontal", "BASE_TABELAS"));
@@ -608,7 +782,7 @@ function renderBASE(){
   let items=streets;
   if(q) items=streets.filter(s=>norm(s.rua).includes(q));
 
-  const wrap=document.createElement("div"); wrap.className="table";
+  const wrap=document.createElement("div"); wrap.className="table cardmode";
   const tbl=document.createElement("table");
   tbl.innerHTML="<thead><tr><th>Rua</th><th class='mono'>Fator Loc</th><th class='mono'>R$/m²</th></tr></thead><tbody></tbody>";
   const tb=tbl.querySelector("tbody");
@@ -620,6 +794,20 @@ function renderBASE(){
     tb.appendChild(tr);
   });
   wrap.appendChild(tbl);
+
+  // Mobile cards (tap para selecionar)
+  const cards=document.createElement("div"); cards.className="tableCards";
+  items.slice(0,240).forEach(s=>{
+    const tc=document.createElement("div"); tc.className="tcard"; tc.style.cursor="pointer";
+    tc.innerHTML =
+      '<div style="font-weight:980;font-size:12px;line-height:1.25;margin-bottom:6px;">'+escapeHtml(s.rua)+'</div>'+
+      '<div class="trow"><div class="tk">Fator loc.</div><div class="tv mono">'+(s.fator??"")+'</div></div>'+
+      '<div class="trow"><div class="tk">R$/m²</div><div class="tv mono">'+(s.valor_m2??"")+'</div></div>';
+    tc.onclick=()=>{ setv("imovel.rua", s.rua); state.tab="INPUT_IMOVEL"; saveLocal(); showToast("Rua selecionada: "+s.rua); render(); };
+    cards.appendChild(tc);
+  });
+  wrap.appendChild(cards);
+
   c.body.appendChild(wrap);
   main.appendChild(c.c);
 }
@@ -627,7 +815,7 @@ function renderBASE(){
 function renderINPUT(){
   const main=document.getElementById("main");
   main.innerHTML="";
-  main.appendChild(hero("INPUT_IMOVEL", "Inputs numéricos não travam. Campos financeiros formatam em moeda (BRL) ao sair do campo."));
+  main.appendChild(hero("INPUT_IMOVEL","Inputs numéricos não travam. Campos financeiros formatam em moeda (BRL) ao sair do campo.","home"));
 
   const a=card("Cadastro do imóvel", "Aba INPUT_IMOVEL");
   const grid=document.createElement("div"); grid.className="fields";
@@ -676,7 +864,7 @@ function renderINPUT(){
 function renderCOMPS(){
   const main=document.getElementById("main");
   main.innerHTML="";
-  main.appendChild(hero("MERCADO_COMPS", "Cadastre comparáveis e calcule o K (= Mercado ÷ Venal). Você pode aplicar a média/mediana como K manual do imóvel."));
+  main.appendChild(hero("MERCADO_COMPS","Cadastre comparáveis e calcule o K (= Mercado ÷ Venal). Você pode aplicar a média/mediana como K manual do imóvel.","comps"));
 
   const stats=card("Resumo dos comparáveis", state.comps.length+" registros");
   const keys=[];
@@ -794,7 +982,7 @@ function renderCOMPS(){
 function renderK(){
   const main=document.getElementById("main");
   main.innerHTML="";
-  main.appendChild(hero("CALIBRACAO_K", "K base vem de CALIBRACAO_K (coluna F) usando o fator de localização inteiro. K manual (se preenchido) tem prioridade."));
+  main.appendChild(hero("CALIBRACAO_K","K base vem de CALIBRACAO_K (coluna F) usando o fator de localização inteiro. K manual (se preenchido) tem prioridade.","sliders"));
   const c=computeImovel();
   const a=card("K do imóvel", c.rua||"—");
   const out=document.createElement("div"); out.className="grid3";
@@ -809,7 +997,7 @@ function renderK(){
 function renderVALUATION(){
   const main=document.getElementById("main");
   main.innerHTML="";
-  main.appendChild(hero("VALUATION_ATUAL", "Resultado final: Venal total × K usado."));
+  main.appendChild(hero("VALUATION_ATUAL","Resultado final: Venal total × K usado.","chart"));
   const c=computeImovel();
   const a=card("Resultado", c.rua||"—");
   const out=document.createElement("div"); out.className="grid3";
@@ -825,7 +1013,7 @@ function renderVALUATION(){
 function renderPREM(){
   const main=document.getElementById("main");
   main.innerHTML="";
-  main.appendChild(hero("PREMISSAS", "Premissas para PROJECAO. Crescimentos em % ao ano. Choque é aplicado antes do Ano 1."));
+  main.appendChild(hero("PREMISSAS","Premissas para PROJECAO. Crescimentos em % ao ano. Choque é aplicado antes do Ano 1.","settings"));
   const a=card("Premissas (editáveis)", "Aba PREMISSAS");
   const grid=document.createElement("div"); grid.className="fields";
   grid.appendChild(fieldText("Horizonte (anos)", "prem.horizon", "Ex.: 3", "B5", {inputmode:"numeric", format:"num"}));
@@ -855,7 +1043,7 @@ function renderPROJ_TABLE(host){
 
   if(c.mercadoEst==null) return;
 
-  const wrap=document.createElement("div"); wrap.className="table";
+  const wrap=document.createElement("div"); wrap.className="table cardmode";
   const tbl=document.createElement("table");
   tbl.innerHTML="<thead><tr><th class='mono'>Ano</th><th class='mono'>Valor BAIXO</th><th class='mono'>Valor BASE</th><th class='mono'>Valor ALTO</th></tr></thead><tbody></tbody>";
   const tb=tbl.querySelector("tbody");
@@ -865,13 +1053,30 @@ function renderPROJ_TABLE(host){
     tb.appendChild(tr);
   });
   wrap.appendChild(tbl);
+
+  // Mobile cards — projeção (0–30)
+  const cards=document.createElement("div"); cards.className="tableCards";
+  p.rows.slice(0,31).forEach(r=>{
+    const tc=document.createElement("div"); tc.className="tcard";
+    tc.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">' +
+        '<div style="font-weight:980;font-size:12px;">Ano '+r.ano+'</div>' +
+        '<div class="badge ok">BASE</div>' +
+      '</div>' +
+      '<div class="trow"><div class="tk">Baixo</div><div class="tv mono">'+money(r.baixo)+'</div></div>' +
+      '<div class="trow"><div class="tk">Base</div><div class="tv mono">'+money(r.base)+'</div></div>' +
+      '<div class="trow"><div class="tk">Alto</div><div class="tv mono">'+money(r.alto)+'</div></div>';
+    cards.appendChild(tc);
+  });
+  wrap.appendChild(cards);
+
   host.appendChild(wrap);
 }
 
 function renderPROJ(){
   const main=document.getElementById("main");
   main.innerHTML="";
-  main.appendChild(hero("PROJECAO", "Valor de mercado ao longo do tempo (Baixo/Base/Alto) com base no valor estimado atual."));
+  main.appendChild(hero("PROJECAO","Valor de mercado ao longo do tempo (Baixo/Base/Alto) com base no valor estimado atual.","chart"));
   const a=card("Tabela de projeção", "Aba PROJECAO");
   const hook=document.createElement("div"); hook.id="projHook";
   a.body.appendChild(hook);
@@ -939,8 +1144,40 @@ function renderDASH_TABLE(host){
     d.innerHTML='<span class="badge warn">Preencha o INPUT_IMOVEL para ver o dashboard.</span>';
     host.appendChild(d); return;
   }
+
   const years=getDashYears();
   const byYear=new Map(p.rows.map(r=>[r.ano,r]));
+  const isMobile = window.matchMedia && window.matchMedia("(max-width: 520px)").matches;
+
+  // Mobile: cards (sem tabela larga)
+  if(isMobile){
+    const cards=document.createElement("div");
+    cards.className="tableCards";
+    years.forEach(y=>{
+      const r=byYear.get(y); if(!r) return;
+      const ahLow=(r.baixo/c.mercadoEst)-1;
+      const ahBase=(r.base/c.mercadoEst)-1;
+      const ahHigh=(r.alto/c.mercadoEst)-1;
+
+      const tc=document.createElement("div"); tc.className="tcard";
+      tc.innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">'+
+          '<div style="font-weight:980;font-size:12px;">Ano '+y+'</div>'+
+          '<div class="badge ok" style="font-size:10px;">Base: '+money(c.mercadoEst)+'</div>'+
+        '</div>'+
+        '<div class="trow"><div class="tk">Baixo</div><div class="tv mono">'+money(r.baixo)+' • '+pct(ahLow)+'</div></div>'+
+        '<div class="trow"><div class="tk">Base</div><div class="tv mono">'+money(r.base)+' • '+pct(ahBase)+'</div></div>'+
+        '<div class="trow"><div class="tk">Alto</div><div class="tv mono">'+money(r.alto)+' • '+pct(ahHigh)+'</div></div>';
+      cards.appendChild(tc);
+    });
+    // wrap in "table" container for visual consistency
+    const wrap=document.createElement("div"); wrap.className="table cardmode";
+    wrap.appendChild(cards);
+    host.appendChild(wrap);
+    return;
+  }
+
+  // Desktop: tabela normal
   const wrap=document.createElement("div"); wrap.className="table";
   const tbl=document.createElement("table");
   tbl.innerHTML="<thead><tr><th class='mono'>Ano</th><th class='mono'>Baixo</th><th class='mono'>A.H</th><th class='mono'>Base</th><th class='mono'>A.H</th><th class='mono'>Alto</th><th class='mono'>A.H</th></tr></thead><tbody></tbody>";
@@ -982,18 +1219,28 @@ function yearPickField(label, key, placeholder){
 function renderDASH(){
   const main=document.getElementById("main");
   main.innerHTML="";
-  main.appendChild(hero("DASHBOARD", "Resumo rápido do imóvel e comparação das projeções (anos escolhidos por você)."));
+  main.appendChild(hero("DASHBOARD","Resumo rápido do imóvel e comparação das projeções (anos escolhidos por você).","check"));
   const c=computeImovel();
 
   const a=card("Principais", "Aba DASHBOARD");
-  a.c.classList.add("dashSticky");
+  a.c.classList.add("dashSticky"); a.c.classList.add("dashCompact");
   const out=document.createElement("div"); out.className="grid3";
+  // compact: principais (sempre visíveis)
   out.appendChild(ro("Rua", c.rua||"—"));
+  out.appendChild(ro("Mercado estimado", c.mercadoEst!=null?money(c.mercadoEst):"—"));
   out.appendChild(ro("Venal total", c.venalTotal!=null?money(c.venalTotal):"—"));
   out.appendChild(ro("K usado", c.kUsado!=null?num2(c.kUsado):"—"));
-  out.appendChild(ro("Mercado estimado", c.mercadoEst!=null?money(c.mercadoEst):"—"));
-  out.appendChild(ro("Crescimento BASE a.a.", (parseBR(getv("prem.base",""))!=null)?(num2(parseBR(getv("prem.base",""))/100)): "—"));
   a.body.appendChild(out);
+
+  // detalhes (colapsável)
+  const det=document.createElement("details");
+  det.style.marginTop="8px";
+  det.innerHTML = '<summary style="cursor:pointer; color:var(--muted); font-weight:950; font-size:11px;">Ver detalhes</summary>';
+  const detWrap=document.createElement("div");
+  detWrap.style.marginTop="10px";
+  detWrap.appendChild(ro("Crescimento BASE a.a.", (parseBR(getv("prem.base",""))!=null)?(num2(parseBR(getv("prem.base",""))/100)): "—"));
+  det.appendChild(detWrap);
+  a.body.appendChild(det);
 
   const b=card("Compara PROJEÇÕES", "Escolha 5 anos (1–30)");
   const right=document.createElement("div"); right.className="dashRightBody";
@@ -1027,6 +1274,7 @@ function renderDASH(){
 
 function render(){
   setSubtitle(); renderDrawer(); renderStepper(); renderBottom();
+  const mainEl=document.getElementById('main'); if(mainEl){ mainEl.classList.remove('fadeIn'); void mainEl.offsetWidth; mainEl.classList.add('fadeIn'); }
   if(state.tab==="BASE_TABELAS") return renderBASE();
   if(state.tab==="INPUT_IMOVEL") return renderINPUT();
   if(state.tab==="MERCADO_COMPS") return renderCOMPS();
