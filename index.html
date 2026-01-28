@@ -360,6 +360,42 @@ html.force-desktop .app{ /* force desktop layout */
 html.force-mobile .cards{ grid-template-columns:1fr !important; }
 html.force-desktop .cards{ grid-template-columns:repeat(2, minmax(0,1fr)) !important; }
 
+
+/* ===== v9: List picker (iOS-friendly) ===== */
+.pickerBack{position:fixed; inset:0; background:rgba(0,0,0,.58); display:none; z-index:85;}
+.picker{
+  position:fixed; left:0; right:0; bottom:0; transform:translateY(110%);
+  transition:transform .18s ease; z-index:95;
+  background:rgba(10,14,24,.98); border-top:1px solid var(--border);
+  border-radius:22px 22px 0 0; box-shadow:var(--shadow);
+  padding:12px 12px calc(14px + env(safe-area-inset-bottom));
+  max-height: min(78svh, 560px); display:flex; flex-direction:column; gap:10px;
+}
+.picker.open{transform:translateY(0);}
+.pickerHdr{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+.pickerTitle{font-weight:980}
+.pickerSearch{display:flex; gap:10px; align-items:center;}
+.pickerSearch input{
+  flex:1 1 auto; height:42px; border-radius:14px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03); color:var(--text);
+  padding:0 12px; font-weight:950; font-size:12px; outline:none;
+}
+.pickerList{
+  overflow:auto; -webkit-overflow-scrolling:touch;
+  border:1px solid var(--border); border-radius:18px; background:rgba(8,10,16,.70);
+}
+.pickerItem{
+  padding:12px 12px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  cursor:pointer;
+}
+.pickerItem:last-child{border-bottom:none}
+.pickerItem .t{font-weight:950; font-size:12px}
+.pickerItem .s{font-size:11px; color:var(--muted)}
+.pickerItem.active{background:rgba(94,234,212,.10)}
+.pickerEmpty{padding:14px; color:var(--muted); font-size:12px}
+
 </style>
 </head>
 <body>
@@ -740,6 +776,15 @@ function fieldDatalist(label, key, listId, placeholder, coord, opts={}){
   const i=document.createElement("input");
   i.className="inp"; i.setAttribute("list", listId);
   i.placeholder=placeholder||""; i.value=getv(key,"");
+  const usePicker = !!opts.picker;
+  if(usePicker && isMobileUI()){
+    i.readOnly=true;
+    i.style.cursor="pointer";
+    i.addEventListener("click", ()=>{
+      const optsArr = (opts.options || []);
+      openListPicker({ key, label, options: optsArr });
+    });
+  }
   if(opts.inputmode) i.setAttribute("inputmode", opts.inputmode);
   i.addEventListener("input", ()=>{ setv(key,i.value); recalc(); });
   i.addEventListener("change", ()=>{ setv(key,i.value); recalc(); });
@@ -960,13 +1005,13 @@ function renderINPUT(){
 
   const a=card("Cadastro do imóvel", "Aba INPUT_IMOVEL");
   const grid=document.createElement("div"); grid.className="fields";
-  grid.appendChild(fieldDatalist("Rua (Matinhos-PR)", "imovel.rua", "ruasList", "Digite para buscar…", "B4"));
+  grid.appendChild(fieldDatalist("Rua (Matinhos-PR)", "imovel.rua", "ruasList", "Toque para escolher…", "B4", {picker:true, options: streets.map(s=>s.rua)}));
   grid.appendChild(fieldText("Área do terreno (m²)", "imovel.area_terreno", "Ex.: 375", "B5", {inputmode:"decimal", format:"num"}));
   grid.appendChild(fieldText("Área construída Ae (m²)", "imovel.area_construida", "Ex.: 0", "B6", {inputmode:"decimal", format:"num"}));
-  grid.appendChild(fieldDatalist("Uso", "imovel.uso", "usoList", "Digite para buscar…", "B7"));
-  grid.appendChild(fieldDatalist("Estrutura", "imovel.estrutura", "estruturaList", "Digite para buscar…", "B8"));
-  grid.appendChild(fieldDatalist("Estado de conservação", "imovel.estado", "estadoList", "Digite para buscar…", "B9"));
-  grid.appendChild(fieldDatalist("Fator de zoneamento (nº)", "imovel.zone", "zoneList", "Digite para buscar…", "B10", {inputmode:"numeric"}));
+  grid.appendChild(fieldDatalist("Uso", "imovel.uso", "usoList", "Toque para escolher…", "B7", {picker:true, options: usoOps}));
+  grid.appendChild(fieldDatalist("Estrutura", "imovel.estrutura", "estruturaList", "Toque para escolher…", "B8", {picker:true, options: estruturaOps}));
+  grid.appendChild(fieldDatalist("Estado de conservação", "imovel.estado", "estadoList", "Toque para escolher…", "B9", {picker:true, options: estadoOps}));
+  grid.appendChild(fieldDatalist("Fator de zoneamento (nº)", "imovel.zone", "zoneList", "Toque para escolher…", "B10", {picker:true, options: zoneOps}));
   grid.appendChild(fieldText("K manual (opcional)", "imovel.k_manual", "Ex.: 29", "B11", {inputmode:"decimal", format:"num"}));
   grid.appendChild(fieldText("Preço de mercado observado (opcional)", "imovel.preco_obs", "Ex.: R$ 300.000,00", "B12", {inputmode:"decimal", format:"money"}));
   a.body.appendChild(grid);
@@ -1529,6 +1574,10 @@ document.getElementById("backdrop").onclick=()=>openDrawer(false);
 
 document.getElementById("sheetClose").onclick=closeYearPicker;
 document.getElementById("sheetBack").onclick=closeYearPicker;
+
+document.getElementById("pickerClose").onclick=closeListPicker;
+document.getElementById("pickerBack").onclick=closeListPicker;
+
 render();
 
 function bindStepperToggle(){
@@ -1561,3 +1610,56 @@ setTimeout(setNavHeightVar, 0);
 </script>
 </body>
 </html>
+// ===== v9: generic list picker (iOS-friendly) =====
+let _pickTarget = null; // {key, label, options, formatter}
+function openListPicker(payload){
+  _pickTarget = payload;
+  const { label, key } = payload;
+  document.getElementById("pickerTitle").textContent = label || "Selecione";
+  const search=document.getElementById("pickerSearch");
+  search.value="";
+  search.oninput=()=>renderListPicker();
+  document.getElementById("pickerBack").style.display="block";
+  document.getElementById("picker").classList.add("open");
+  renderListPicker();
+  setTimeout(()=>search.focus(), 80);
+}
+function closeListPicker(){
+  document.getElementById("picker").classList.remove("open");
+  document.getElementById("pickerBack").style.display="none";
+  _pickTarget = null;
+}
+function renderListPicker(){
+  const host=document.getElementById("pickerList");
+  host.innerHTML="";
+  if(!_pickTarget) return;
+  const { key, options, formatter } = _pickTarget;
+  const q = norm(document.getElementById("pickerSearch").value||"");
+  const cur = String(getv(key,"")||"").trim();
+  const list = (options||[]).filter(x=> !q || norm(String(x)).includes(q));
+
+  if(!list.length){
+    const d=document.createElement("div");
+    d.className="pickerEmpty";
+    d.textContent="Nenhum resultado.";
+    host.appendChild(d);
+    return;
+  }
+
+  list.slice(0, 1200).forEach(opt=>{
+    const val = String(opt);
+    const item=document.createElement("div");
+    item.className="pickerItem"+(val===cur?" active":"");
+    item.innerHTML = '<div class="t">'+escapeHtml(formatter?formatter(val):val)+'</div>';
+    item.onclick=()=>{
+      setv(key, val);
+      closeListPicker();
+      recalc();
+      render(); // refresh visible value
+      showToast("Selecionado: "+val);
+    };
+    host.appendChild(item);
+  });
+}
+
+
