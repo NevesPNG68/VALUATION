@@ -369,7 +369,7 @@ html.force-desktop .cards{ grid-template-columns:repeat(2, minmax(0,1fr)) !impor
       <div class="brand">
         <div class="logo"><span>V</span></div>
         <div class="twrap">
-          <div class="title">Valuation IMÓVEL</div>
+          <div class="title">Valuation IMÓVEL <span class="verPill" id="verPill"></span></div>
           <div class="subtitle" id="subinfo"></div>
         </div>
       </div>
@@ -518,6 +518,7 @@ const TAB_ICON = {
   DASHBOARD:"check"
 };
 
+const APP_VERSION="v8.1";
 const STORAGE_KEY="valuation_app_state_v7";
 const state={ tab:"INPUT_IMOVEL", edits:{}, comps:[] };
 function loadLocal(){ try{ const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return; const obj=JSON.parse(raw); if(obj){ state.tab=obj.tab||state.tab; state.edits=obj.edits||state.edits; state.comps=Array.isArray(obj.comps)?obj.comps:state.comps; } }catch(e){} }
@@ -558,7 +559,7 @@ function setSubtitle(){
   const el=document.getElementById("subinfo");
   const d=new Date(window.APP_DATA.generated_at);
   const when=d.toLocaleString("pt-BR");
-  el.textContent = "Desenvolvido por Renato Neves • Fonte: " + window.APP_DATA.workbook + " • " + when;
+  el.textContent="Desenvolvido por Renato Neves • "+APP_VERSION+" • Fonte: "+window.APP_DATA.workbook+" • "+when;
 }
 
 const T=window.APP_DATA.tables;
@@ -1507,6 +1508,9 @@ function renderDASH(){
 
 
 function render(){
+  const vp=document.getElementById("verPill");
+  if(vp) vp.textContent=APP_VERSION;
+
   setSubtitle(); renderDrawer(); renderStepper(); renderBottom();
   const mainEl=document.getElementById('main'); if(mainEl){ mainEl.classList.remove('fadeIn'); void mainEl.offsetWidth; mainEl.classList.add('fadeIn'); }
   if(state.tab==="BASE_TABELAS") return renderBASE();
