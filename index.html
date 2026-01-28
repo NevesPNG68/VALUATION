@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Valuation IMÓVEL • App</title>
+<style>
+:root{
+  --bg:#060810; --border:rgba(255,255,255,.09);
+  --text:rgba(255,255,255,.92); --muted:rgba(255,255,255,.62); --muted2:rgba(255,255,255,.45);
+  --accent:#5eead4; --warn:#fbbf24; --bad:#fb7185; --ok:#34d399;
+  --shadow:0 18px 50px rgba(0,0,0,.55);
+  --r:18px; --r2:22px;
+  --font:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+  --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:var(--font); color:var(--text); overflow:hidden;
+  background:
+    radial-gradient(1000px 700px at 15% 0%, rgba(94,234,212,.12), transparent 60%),
+    radial-gradient(900px 600px at 90% 10%, rgba(251,191,36,.09), transparent 55%),
+    var(--bg);
+}
+.app{height:100%; display:grid; grid-template-rows:auto 1fr auto;}
+.topbar{
+  padding:12px 12px 10px; border-bottom:1px solid var(--border);
+  background:rgba(8,10,16,.70); backdrop-filter: blur(10px);
+}
+.toprow{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+.brand{display:flex; align-items:center; gap:10px; min-width:0;}
+.logo{
+  width:42px; height:42px; border-radius:16px; flex:0 0 auto;
+  background:linear-gradient(135deg, rgba(94,234,212,.20), rgba(251,191,36,.15));
+  border:1px solid var(--border); box-shadow:var(--shadow);
+  display:grid; place-items:center;
+}
+.logo span{font-weight:950}
+.twrap{min-width:0}
+.title{font-weight:980; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.subtitle{margin-top:2px; font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.iconbtn{
+  width:42px; height:42px; border-radius:16px; border:1px solid var(--border);
+  background:rgba(255,255,255,.04); color:var(--text);
+  display:grid; place-items:center; cursor:pointer; user-select:none;
+}
+.iconbtn:active{transform:translateY(1px)}
+.stepper{margin-top:10px; display:flex; gap:8px; overflow:auto; padding-bottom:2px;}
+.chip{
+  border:1px solid var(--border); background:rgba(255,255,255,.03); color:var(--muted);
+  border-radius:999px; padding:8px 10px; font-weight:950; font-size:11px; white-space:nowrap; cursor:pointer;
+}
+.chip.active{color:var(--text); border-color:rgba(94,234,212,.35); background:rgba(94,234,212,.10)}
+
+.main{overflow:auto; -webkit-overflow-scrolling:touch; padding:14px;}
+.hero{
+  border:1px solid var(--border);
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+  border-radius:var(--r2); box-shadow:var(--shadow); padding:14px;
+}
+.hero h1{margin:0; font-size:16px; letter-spacing:.2px}
+.hero p{margin:6px 0 0; color:var(--muted); font-size:12px; line-height:1.35}
+.btnrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+.btn{
+  appearance:none; border:1px solid var(--border); background:rgba(255,255,255,.04); color:var(--text);
+  padding:10px 12px; border-radius:14px; font-size:12px; font-weight:950; cursor:pointer;
+}
+.btn.primary{border-color:rgba(94,234,212,.38); background:rgba(94,234,212,.10)}
+.btn.warn{border-color:rgba(251,191,36,.35); background:rgba(251,191,36,.10)}
+.btn.bad{border-color:rgba(251,113,133,.38); background:rgba(251,113,133,.10)}
+.btn:active{transform:translateY(1px)}
+
+.cards{display:grid; gap:12px; margin-top:12px;}
+@media (min-width: 920px){ .cards{grid-template-columns:repeat(2, minmax(0,1fr))} }
+.card{
+  border:1px solid var(--border);
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+  border-radius:var(--r2); box-shadow:var(--shadow); overflow:hidden;
+}
+.cardbar{
+  padding:12px 12px 10px; border-bottom:1px solid var(--border);
+  background:rgba(12,16,32,.55); display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.cardbar .name{font-weight:980; font-size:12px}
+.cardbar .meta{font-size:11px; color:var(--muted)}
+.cardbody{padding:12px}
+
+.fields{display:grid; gap:10px;}
+@media (min-width: 920px){ .fields{grid-template-columns:repeat(2, minmax(0,1fr))} }
+.field{display:flex; flex-direction:column; gap:6px;}
+.label{
+  font-size:11px; color:var(--muted); font-weight:950;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+.coord{
+  font-family:var(--mono); font-size:10px; color:rgba(255,255,255,.55);
+  border:1px solid var(--border); padding:2px 6px; border-radius:999px;
+  background:rgba(255,255,255,.03); white-space:nowrap;
+}
+input.inp{
+  width:100%; height:42px; border-radius:14px;
+  border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.03);
+  color:var(--text); outline:none; padding:0 12px; font-weight:950; font-size:12px;
+}
+input.inp:focus{border-color:rgba(94,234,212,.55); box-shadow:0 0 0 3px rgba(94,234,212,.12);}
+input.readonly{opacity:.92}
+input.inp[disabled]{opacity:.75}
+.helper{margin-top:8px; color:var(--muted2); font-size:11px; line-height:1.35}
+.grid3{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+@media (min-width: 920px){ .grid3{grid-template-columns:repeat(3, minmax(0,1fr))} }
+.table{
+  margin-top:10px; border:1px solid var(--border); border-radius:18px; overflow:auto;
+  background:rgba(8,10,16,.70); box-shadow:var(--shadow);
+}
+.table table{width:100%; border-collapse:collapse; min-width:860px;}
+.table th, .table td{padding:10px 12px; border-bottom:1px solid var(--border); text-align:left; font-size:12px;}
+.table th{position:sticky; top:0; background:rgba(12,16,32,.92); color:var(--muted); font-weight:950; font-size:11px; z-index:2;}
+.table tr:last-child td{border-bottom:none}
+.mono{font-family:var(--mono)}
+.badge{display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; border:1px solid var(--border); background:rgba(255,255,255,.03); font-size:11px; font-weight:950; color:var(--muted)}
+.badge.ok{border-color:rgba(52,211,153,.35); background:rgba(52,211,153,.10); color:rgba(255,255,255,.86)}
+.badge.warn{border-color:rgba(251,191,36,.35); background:rgba(251,191,36,.10); color:rgba(255,255,255,.86)}
+.badge.bad{border-color:rgba(251,113,133,.35); background:rgba(251,113,133,.10); color:rgba(255,255,255,.86)}
+
+.nav{
+  border-top:1px solid var(--border);
+  background:rgba(8,10,16,.75); backdrop-filter: blur(10px);
+  padding:10px 10px calc(10px + env(safe-area-inset-bottom));
+}
+.navrow{display:flex; gap:8px; overflow:auto; -webkit-overflow-scrolling:touch; max-width:980px; margin:0 auto; padding-bottom:2px}
+.navbtn{min-width:92px;
+  border:1px solid var(--border); background:rgba(255,255,255,.03); color:var(--muted);
+  border-radius:16px; padding:10px 8px; text-align:center; font-weight:980; font-size:11px;
+  cursor:pointer; user-select:none; display:flex; flex-direction:column; gap:6px; align-items:center; justify-content:center;
+}
+.navbtn.active{color:var(--text); border-color:rgba(94,234,212,.35); background:rgba(94,234,212,.10)}
+.ico{width:18px; height:18px; border-radius:7px; border:1px solid var(--border); background:rgba(255,255,255,.04); display:grid; place-items:center; font-size:12px}
+
+.drawerBackdrop{ position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; z-index:50; }
+.drawer{
+  position:fixed; top:0; right:0; height:100%; width:min(360px, 92vw);
+  background:rgba(10,14,24,.98); border-left:1px solid var(--border); box-shadow:var(--shadow);
+  transform:translateX(100%); transition:transform .18s ease; z-index:60; display:flex; flex-direction:column;
+}
+.drawer.open{transform:translateX(0)}
+.drawerHdr{padding:14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px}
+.drawerHdr .h{font-weight:980}
+.drawerBody{padding:10px; overflow:auto}
+.menuItem{padding:12px 12px; border:1px solid var(--border); border-radius:16px; background:rgba(255,255,255,.03); margin-bottom:10px; cursor:pointer;}
+.menuItem .t{font-weight:980; font-size:12px}
+.menuItem .s{margin-top:4px; font-size:11px; color:var(--muted)}
+.menuItem.active{border-color:rgba(94,234,212,.35); background:rgba(94,234,212,.10)}
+
+.toast{
+  position:fixed; left:50%; bottom:84px; transform:translateX(-50%);
+  background:rgba(12,16,32,.92); border:1px solid var(--border); border-radius:999px;
+  padding:10px 14px; box-shadow:var(--shadow); color:var(--text); font-weight:950; font-size:12px;
+  display:none; max-width:min(760px, calc(100vw - 28px));
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; z-index:70;
+}
+
+/* DASHBOARD layout: left fixed (sem rolagem), direita com rolagem interna */
+.dashGrid{display:grid; gap:12px; margin-top:12px;}
+@media (min-width: 920px){
+  .dashGrid{grid-template-columns: 1.05fr 1.25fr; align-items:start;}
+  .dashSticky{position:sticky; top:12px;}
+  .dashRightBody{display:flex; flex-direction:column; gap:10px; max-height: calc(100vh - 210px); overflow:hidden;}
+  .dashRightScroll{flex:1 1 auto; overflow:auto; border-radius:18px;}
+}
+/* Year picker bottom-sheet */
+.sheetBack{position:fixed; inset:0; background:rgba(0,0,0,.58); display:none; z-index:80;}
+.sheet{position:fixed; left:0; right:0; bottom:0; transform:translateY(110%); transition:transform .18s ease; z-index:90;
+  background:rgba(10,14,24,.98); border-top:1px solid var(--border); border-radius:22px 22px 0 0; box-shadow:var(--shadow);
+  padding:12px 12px calc(14px + env(safe-area-inset-bottom));
+}
+.sheet.open{transform:translateY(0);}
+.sheetHdr{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 2px 10px;}
+.sheetTitle{font-weight:980}
+.sheetGrid{display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:8px;}
+@media (min-width: 520px){ .sheetGrid{grid-template-columns:repeat(10, minmax(0,1fr));} }
+.nbtn{border:1px solid var(--border); background:rgba(255,255,255,.03); color:var(--text); border-radius:14px; padding:10px 0;
+  font-weight:980; font-size:12px; cursor:pointer; user-select:none;
+}
+.nbtn.active{border-color:rgba(94,234,212,.35); background:rgba(94,234,212,.10)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="toprow">
+      <div class="brand">
+        <div class="logo"><span>V</span></div>
+        <div class="twrap">
+          <div class="title">Valuation IMÓVEL</div>
+          <div class="subtitle" id="subinfo"></div>
+        </div>
+      </div>
+      <button class="iconbtn" id="openMenu" title="Abas">☰</button>
+    </div>
+    <div class="stepper" id="stepper"></div>
+  </div>
+
+  <div class="main" id="main"></div>
+
+  <div class="nav">
+    <div class="navrow" id="navrow"></div>
+  </div>
+</div>
+
+<div class="drawerBackdrop" id="backdrop"></div>
+<div class="drawer" id="drawer">
+  <div class="drawerHdr">
+    <div class="h">Abas do arquivo</div>
+    <button class="iconbtn" id="closeMenu" title="Fechar">✕</button>
+  </div>
+  <div class="drawerBody" id="drawerBody"></div>
+</div>
+
+<div class="sheetBack" id="sheetBack"></div>
+<div class="sheet" id="sheet">
+  <div class="sheetHdr">
+    <div class="sheetTitle" id="sheetTitle">Selecione o ano</div>
+    <button class="iconbtn" id="sheetClose" title="Fechar">✕</button>
+  </div>
+  <div class="helper" style="margin:0 2px 10px;">Escolha um número de <b>1</b> a <b>30</b>.</div>
+  <div class="sheetGrid" id="sheetGrid"></div>
+</div>
+
+<datalist id="ruasList"></datalist>
+<datalist id="usoList"></datalist>
+<datalist id="estruturaList"></datalist>
+<datalist id="estadoList"></datalist>
+<datalist id="zoneList"></datalist>
+
+<div class="toast" id="toast"></div>
+
+<script>window.APP_DATA = {"generated_at":"2026-01-27T00:00:00Z","workbook":"Valuation_Matinhos_v4_FINAL_listas_e_calibracao_ok.xlsx","tables":{"streets":[/* ... dados embutidos ... */]}};</script>
+<script>
+/* OBS:
+   O bloco window.APP_DATA acima contém MUITOS dados (lista de ruas e tabelas).
+   No arquivo real ele está completo. Se aqui aparecer abreviado, use o download:
+   sandbox:/mnt/data/index.html
+*/
+
+const nf2 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const nfc = new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' });
+function money(v){ if(v==null||Number.isNaN(v)) return "—"; return nfc.format(v); }
+function num2(v){ if(v==null||Number.isNaN(v)) return "—"; return nf2.format(v); }
+function pct(v){ if(v==null||Number.isNaN(v)) return "—"; return nf2.format(v*100) + "%"; }
+function parseBR(s){
+  if(s==null) return null;
+  const t=String(s).trim();
+  if(!t) return null;
+  const cleaned=t.replace(/[^0-9,\.\-]/g,'');
+  if(!cleaned) return null;
+  const n=Number(cleaned.replace(/\./g,"").replace(",", "."));
+  return Number.isFinite(n) ? n : null;
+}
+function norm(s){
+  return String(s||"")
+    .trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/\s+/g,' ');
+}
+function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.style.display="block";
+  clearTimeout(showToast._t);
+  showToast._t=setTimeout(()=>t.style.display="none", 2400);
+}
+
+const STORAGE_KEY="valuation_app_state_v7";
+const state={ tab:"INPUT_IMOVEL", edits:{}, comps:[] };
+function loadLocal(){ try{ const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return; const obj=JSON.parse(raw); if(obj){ state.tab=obj.tab||state.tab; state.edits=obj.edits||state.edits; state.comps=Array.isArray(obj.comps)?obj.comps:state.comps; } }catch(e){} }
+function saveLocal(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+loadLocal();
+
+function getv(key, def=""){ return Object.prototype.hasOwnProperty.call(state.edits, key) ? state.edits[key] : def; }
+function setv(key, value){ state.edits[key]=value; saveLocal(); }
+
+function resetAll(){ state.edits={}; state.comps=[]; saveLocal(); showToast("Dados resetados."); render(); }
+function resetInputImovel(){
+  const keys = Object.keys(state.edits);
+  keys.forEach(k=>{
+    if(k.startsWith("imovel.") || k==="hint") delete state.edits[k];
+  });
+  saveLocal();
+  showToast("INPUT_IMOVEL limpo.");
+  render();
+}
+
+let _yearPickKey=null;
+
+function openYearPicker(key, label){
+  _yearPickKey=key;
+  document.getElementById("sheetTitle").textContent = label || "Selecione o ano";
+  const grid=document.getElementById("sheetGrid");
+  grid.innerHTML="";
+  const current = parseInt(parseBR(getv(key,"")) ?? 0, 10) || 0;
+
+  for(let i=1;i<=30;i++){
+    const b=document.createElement("button");
+    b.className="nbtn"+(i===current?" active":"");
+    b.textContent=String(i);
+    b.onclick=()=>{
+      setv(key, String(i));
+      closeYearPicker();
+      recalc();
+      const dashHook=document.getElementById("dashHook");
+      if(dashHook) renderDASH_TABLE(dashHook);
+      const inp=document.querySelector('input[data-pick="'+key+'"]');
+      if(inp) inp.value=String(i);
+    };
+    grid.appendChild(b);
+  }
+  document.getElementById("sheetBack").style.display="block";
+  document.getElementById("sheet").classList.add("open");
+}
+function closeYearPicker(){
+  document.getElementById("sheet").classList.remove("open");
+  document.getElementById("sheetBack").style.display="none";
+  _yearPickKey=null;
+}
+
+function setSubtitle(){
+  const el=document.getElementById("subinfo");
+  const d=new Date(window.APP_DATA.generated_at);
+  el.textContent="Fonte: "+window.APP_DATA.workbook+" • "+d.toLocaleString("pt-BR");
+}
+
+const T=window.APP_DATA.tables;
+const streets=T.streets||[];
+const streetMap = (()=>{ const m=new Map(); streets.forEach(s=>m.set(norm(s.rua), s)); return m; })();
+const usoOps=(T.vu_cols||[]).slice();
+const estruturaOps=(T.vu_rows||[]).slice();
+const estadoKeys=Object.keys(T.fo||{});
+const estadoOps=estadoKeys.map(k=>k.toLowerCase().replace(/\b\w/g, c=>c.toUpperCase()));
+const zoneOps=Object.keys(T.fz||{});
+
+function hydrateLists(){
+  document.getElementById("ruasList").innerHTML = streets.map(s=>'<option value="'+escapeHtml(s.rua)+'"></option>').join("");
+  document.getElementById("usoList").innerHTML = usoOps.map(s=>'<option value="'+escapeHtml(s)+'"></option>').join("");
+  document.getElementById("estruturaList").innerHTML = estruturaOps.map(s=>'<option value="'+escapeHtml(s)+'"></option>').join("");
+  document.getElementById("estadoList").innerHTML = estadoOps.map(s=>'<option value="'+escapeHtml(s)+'"></option>').join("");
+  document.getElementById("zoneList").innerHTML = zoneOps.map(s=>'<option value="'+escapeHtml(s)+'"></option>').join("");
+}
+hydrateLists();
+
+// premissas defaults
+if(getv("prem.horizon","")==="") setv("prem.horizon", String(T.prem_defaults?.horizon_years ?? 3));
+if(getv("prem.low","")==="") setv("prem.low", String((T.prem_defaults?.growth_low ?? 0.03)*100));
+if(getv("prem.base","")==="") setv("prem.base", String((T.prem_defaults?.growth_base ?? 0.10)*100));
+if(getv("prem.high","")==="") setv("prem.high", String((T.prem_defaults?.growth_high ?? 0.09)*100));
+if(getv("prem.shock","")==="") setv("prem.shock", String((T.prem_defaults?.shock_y1 ?? 0.0)*100));
+if(getv("dash.y1","")==="") setv("dash.y1","1");
+if(getv("dash.y2","")==="") setv("dash.y2","2");
+if(getv("dash.y3","")==="") setv("dash.y3","5");
+if(getv("dash.y4","")==="") setv("dash.y4","10");
+if(getv("dash.y5","")==="") setv("dash.y5","15");
+
+// comps defaults
+if(!state.comps.length && Array.isArray(T.comps_defaults) && T.comps_defaults.length){
+  state.comps = T.comps_defaults.map(x=>({...x}));
+  saveLocal();
+}
+
+const TABS=[
+  {id:"BASE_TABELAS", title:"BASE_TABELAS", subtitle:"Tabela completa (Ruas • fator localização • R$/m²)"},
+  {id:"INPUT_IMOVEL", title:"INPUT_IMOVEL", subtitle:"Inputs + listas suspensas + cálculos automáticos"},
+  {id:"MERCADO_COMPS", title:"MERCADO_COMPS", subtitle:"Comparáveis: calcula K por imóvel e estatísticas"},
+  {id:"CALIBRACAO_K", title:"CALIBRACAO_K", subtitle:"K base + override manual (K manual)"},
+  {id:"VALUATION_ATUAL", title:"VALUATION_ATUAL", subtitle:"Resultado: Venal × K usado"},
+  {id:"PREMISSAS", title:"PREMISSAS", subtitle:"Premissas para projeções (horizonte, crescimento, choque)"},
+  {id:"PROJECAO", title:"PROJECAO", subtitle:"Tabela de projeção (Baixo/Base/Alto)"},
+  {id:"DASHBOARD", title:"DASHBOARD", subtitle:"Resumo rápido + comparação de projeções"},
+];
+const FLOW=[
+  {id:"BASE_TABELAS", label:"1) Ruas"},
+  {id:"INPUT_IMOVEL", label:"2) Imóvel"},
+  {id:"MERCADO_COMPS", label:"3) Comps"},
+  {id:"CALIBRACAO_K", label:"4) K"},
+  {id:"PROJECAO", label:"5) Projeção"},
+  {id:"DASHBOARD", label:"6) Dashboard"},
+];
+const BOTTOM=[
+  {id:"BASE_TABELAS", icon:"📚", label:"Base"},
+  {id:"INPUT_IMOVEL", icon:"🏠", label:"Imóvel"},
+  {id:"MERCADO_COMPS", icon:"🧾", label:"Comps"},
+  {id:"CALIBRACAO_K", icon:"🎛️", label:"K"},
+  {id:"VALUATION_ATUAL", icon:"📊", label:"Valor"},
+  {id:"PREMISSAS", icon:"⚙️", label:"Premissas"},
+  {id:"PROJECAO", icon:"📈", label:"Projeção"},
+  {id:"DASHBOARD", icon:"✅", label:"Dash"},
+];
+
+function openDrawer(open){
+  const drawer=document.getElementById("drawer");
+  const backdrop=document.getElementById("backdrop");
+  if(open){ drawer.classList.add("open"); backdrop.style.display="block"; }
+  else { drawer.classList.remove("open"); backdrop.style.display="none"; }
+}
+function renderDrawer(){
+  const body=document.getElementById("drawerBody");
+  body.innerHTML="";
+  TABS.forEach(t=>{
+    const d=document.createElement("div");
+    d.className="menuItem"+(state.tab===t.id?" active":"");
+    d.innerHTML='<div class="t">'+escapeHtml(t.title)+'</div><div class="s">'+escapeHtml(t.subtitle)+'</div>';
+    d.onclick=()=>{ state.tab=t.id; saveLocal(); openDrawer(false); render(); };
+    body.appendChild(d);
+  });
+}
+function renderStepper(){
+  const el=document.getElementById("stepper");
+  el.innerHTML="";
+  FLOW.forEach(s=>{
+    const b=document.createElement("button");
+    b.className="chip"+(state.tab===s.id?" active":"");
+    b.textContent=s.label;
+    b.onclick=()=>{ state.tab=s.id; saveLocal(); render(); };
+    el.appendChild(b);
+  });
+}
+function renderBottom(){
+  const row=document.getElementById("navrow");
+  row.innerHTML="";
+  BOTTOM.forEach(s=>{
+    const b=document.createElement("button");
+    b.className="navbtn"+(state.tab===s.id?" active":"");
+    b.innerHTML='<div class="ico">'+s.icon+'</div><div>'+s.label+'</div>';
+    b.onclick=()=>{ state.tab=s.id; saveLocal(); render(); };
+    row.appendChild(b);
+  });
+}
+
+function hero(title, desc){
+  const h=document.createElement("div");
+  h.className="hero";
+  h.innerHTML='<h1>'+escapeHtml(title)+'</h1><p>'+escapeHtml(desc)+'</p>';
+  const row=document.createElement("div");
+  row.className="btnrow";
+  row.innerHTML='<button class="btn warn" id="bres">Resetar tudo</button>';
+  h.appendChild(row);
+  setTimeout(()=>{ document.getElementById("bres").onclick=resetAll; },0);
+  return h;
+}
+function card(title, meta){
+  const c=document.createElement("div");
+  c.className="card";
+  c.innerHTML='<div class="cardbar"><div class="name">'+escapeHtml(title)+'</div><div class="meta">'+escapeHtml(meta||"")+'</div></div><div class="cardbody"></div>';
+  return {c, body:c.querySelector(".cardbody")};
+}
+
+function fieldDatalist(label, key, listId, placeholder, coord, opts={}){
+  const w=document.createElement("div");
+  w.className="field";
+  w.innerHTML='<div class="label"><span>'+escapeHtml(label)+'</span>'+(coord?'<span class="coord">'+escapeHtml(coord)+'</span>':"")+'</div>';
+  const i=document.createElement("input");
+  i.className="inp"; i.setAttribute("list", listId);
+  i.placeholder=placeholder||""; i.value=getv(key,"");
+  if(opts.inputmode) i.setAttribute("inputmode", opts.inputmode);
+  i.addEventListener("input", ()=>{ setv(key,i.value); recalc(); });
+  i.addEventListener("change", ()=>{ setv(key,i.value); recalc(); });
+  i.addEventListener("blur", ()=>{
+    if(opts.format==="money"){ const n=parseBR(i.value); i.value=(n==null)?"":money(n); }
+    if(opts.format==="num"){ const n=parseBR(i.value); i.value=(n==null)?"":num2(n); }
+    setv(key,i.value); recalc();
+  });
+  w.appendChild(i); return w;
+}
+function fieldText(label, key, placeholder, coord, opts={}){
+  const w=document.createElement("div");
+  w.className="field";
+  w.innerHTML='<div class="label"><span>'+escapeHtml(label)+'</span>'+(coord?'<span class="coord">'+escapeHtml(coord)+'</span>':"")+'</div>';
+  const i=document.createElement("input");
+  i.className="inp"; i.placeholder=placeholder||""; i.value=getv(key,"");
+  if(opts.inputmode) i.setAttribute("inputmode", opts.inputmode);
+  i.addEventListener("input", ()=>{ setv(key,i.value); recalc(); });
+  i.addEventListener("change", ()=>{ setv(key,i.value); recalc(); });
+  i.addEventListener("blur", ()=>{
+    if(opts.format==="money"){ const n=parseBR(i.value); i.value=(n==null)?"":money(n); }
+    if(opts.format==="num"){ const n=parseBR(i.value); i.value=(n==null)?"":num2(n); }
+    setv(key,i.value); recalc();
+  });
+  w.appendChild(i); return w;
+}
+function fieldOut(label, id, coord){
+  const w=document.createElement("div");
+  w.className="field";
+  w.innerHTML='<div class="label"><span>'+escapeHtml(label)+'</span>'+(coord?'<span class="coord">'+escapeHtml(coord)+'</span>':"")+'</div>';
+  const i=document.createElement("input");
+  i.className="inp readonly"; i.disabled=true; i.id=id; i.value="—";
+  w.appendChild(i); return w;
+}
+function ro(label, val){
+  const w=document.createElement("div"); w.className="field";
+  w.innerHTML='<div class="label"><span>'+escapeHtml(label)+'</span></div>';
+  const i=document.createElement("input"); i.className="inp readonly"; i.disabled=true; i.value=val; w.appendChild(i);
+  return w;
+}
+
+function computeImovel(){
+  const rua=(getv("imovel.rua","")||"").trim();
+  const areaTerr=parseBR(getv("imovel.area_terreno",""));
+  const areaCons=parseBR(getv("imovel.area_construida",""));
+  const uso=(getv("imovel.uso","")||"").trim().toUpperCase();
+  const estrutura=(getv("imovel.estrutura","")||"").trim().toUpperCase();
+  const estado=(getv("imovel.estado","")||"").trim().toUpperCase();
+  const zone=(getv("imovel.zone","")||"").trim();
+  const kManual=parseBR(getv("imovel.k_manual",""));
+  const precoObs=parseBR(getv("imovel.preco_obs",""));
+
+  const s=streetMap.get(norm(rua))||null;
+  const fatorLoc=s?s.fator:null;
+  const valorM2=s?s.valor_m2:null;
+
+  const venalTerr=(areaTerr!=null && valorM2!=null) ? (areaTerr*valorM2) : null;
+  const vu=(T.vu && T.vu[estrutura] && T.vu[estrutura][uso]!=null) ? T.vu[estrutura][uso] : null;
+  const fo=(T.fo && T.fo[estado]!=null) ? T.fo[estado] : null;
+  const fz=(T.fz && zone && T.fz[zone] && T.fz[zone][uso]!=null) ? T.fz[zone][uso] : null;
+
+  const vve=(areaCons!=null && vu!=null && fo!=null && fz!=null) ? (areaCons*vu*fo*fz) : null;
+  const venalTotal=(venalTerr!=null) ? (venalTerr + (vve||0)) : null;
+
+  let kBase=null;
+  if(fatorLoc!=null){
+    const kKey=String(parseInt(fatorLoc,10));
+    if(T.k_used && T.k_used[kKey]!=null) kBase=T.k_used[kKey];
+  }
+  const kUsado=(kManual!=null) ? kManual : kBase;
+
+  const mercadoEst=(venalTotal!=null && kUsado!=null) ? (venalTotal*kUsado) : null;
+  const dif=(mercadoEst!=null && precoObs!=null) ? (mercadoEst-precoObs) : null;
+  const difPct=(dif!=null && precoObs!=null && precoObs!=0) ? (dif/precoObs) : null;
+
+  return { rua, uso, estrutura, estado, zone, fatorLoc, valorM2, venalTerr, vu, fo, fz, vve, venalTotal, kBase, kUsado, mercadoEst, precoObs, dif, difPct };
+}
+
+function computeComp(comp){
+  const rua=(comp.rua||"").trim();
+  const areaTerr=comp.area_terreno==null?null:Number(comp.area_terreno);
+  const areaCons=comp.area_construida==null?null:Number(comp.area_construida);
+  const uso=(comp.uso||"").trim().toUpperCase();
+  const estrutura=(comp.estrutura||"").trim().toUpperCase();
+  const estado=(comp.estado||"").trim().toUpperCase();
+  const zone=(comp.zone||"").trim();
+  const preco=comp.preco==null?null:Number(comp.preco);
+
+  const s=streetMap.get(norm(rua))||null;
+  const fatorLoc=s?s.fator:null;
+  const valorM2=s?s.valor_m2:null;
+
+  const venalTerr=(areaTerr!=null && valorM2!=null) ? (areaTerr*valorM2) : null;
+  const vu=(T.vu && T.vu[estrutura] && T.vu[estrutura][uso]!=null) ? T.vu[estrutura][uso] : null;
+  const fo=(T.fo && T.fo[estado]!=null) ? T.fo[estado] : null;
+  const fz=(T.fz && zone && T.fz[zone] && T.fz[zone][uso]!=null) ? T.fz[zone][uso] : null;
+  const vve=(areaCons!=null && vu!=null && fo!=null && fz!=null) ? (areaCons*vu*fo*fz) : null;
+  const venalTotal=(venalTerr!=null) ? (venalTerr + (vve||0)) : null;
+  const k=(preco!=null && venalTotal!=null && venalTotal!==0) ? (preco/venalTotal) : null;
+
+  return {fatorLoc, valorM2, venalTerr, vve, venalTotal, k};
+}
+
+function setOut(id, v){ const el=document.getElementById(id); if(el) el.value=v; }
+
+function recalc(){
+  const c=computeImovel();
+  setOut("o_zone", c.zone? String(c.zone):"—");
+  setOut("o_fatorLoc", c.fatorLoc!=null? String(c.fatorLoc):"—");
+  setOut("o_valorM2", c.valorM2!=null? money(c.valorM2):"—");
+  setOut("o_venalTerr", c.venalTerr!=null? money(c.venalTerr):"—");
+  setOut("o_vu", c.vu!=null? money(c.vu):"—");
+  setOut("o_fo", c.fo!=null? num2(c.fo):"—");
+  setOut("o_fz", c.fz!=null? num2(c.fz):"—");
+  setOut("o_vve", c.vve!=null? money(c.vve):"—");
+  setOut("o_venalTotal", c.venalTotal!=null? money(c.venalTotal):"—");
+  setOut("o_k", c.kUsado!=null? num2(c.kUsado):"—");
+  setOut("o_mercado", c.mercadoEst!=null? money(c.mercadoEst):"—");
+  setOut("o_dif", c.dif!=null? money(c.dif):"—");
+  setOut("o_difpct", c.difPct!=null? pct(c.difPct):"—");
+
+  const hint=document.getElementById("hint");
+  if(hint){
+    const req=[];
+    if(!c.rua) req.push("Rua");
+    if(c.fatorLoc==null || c.valorM2==null) req.push("Rua válida (exata da lista)");
+    if(parseBR(getv("imovel.area_terreno",""))==null) req.push("Área do terreno");
+    if(!getv("imovel.uso","").trim()) req.push("Uso");
+    if(!getv("imovel.estrutura","").trim()) req.push("Estrutura");
+    if(!getv("imovel.estado","").trim()) req.push("Estado");
+    if(!getv("imovel.zone","").trim()) req.push("Zoneamento");
+    if(c.vu==null) req.push("Vu (Estrutura×Uso)");
+    if(c.fo==null) req.push("Fo (Estado)");
+    if(c.fz==null) req.push("Fz (Zoneamento×Uso)");
+    hint.textContent = req.length ? ("Para bater com a planilha, falta/está inválido: "+req.join(", ") + ".") : "✅ Tudo consistente: cálculos iguais ao Excel (com os mesmos inputs).";
+  }
+
+  const projHook=document.getElementById("projHook");
+  if(projHook) renderPROJ_TABLE(projHook);
+  const dashHook=document.getElementById("dashHook");
+  if(dashHook) renderDASH_TABLE(dashHook);
+}
+
+function projectionSeries(){
+  const base=computeImovel().mercadoEst;
+  const horizon=Math.max(0, parseInt(getv("prem.horizon","3"),10)||0);
+  const gLow=(parseBR(getv("prem.low","3"))||0)/100;
+  const gBase=(parseBR(getv("prem.base","10"))||0)/100;
+  const gHigh=(parseBR(getv("prem.high","9"))||0)/100;
+  const shock=(parseBR(getv("prem.shock","0"))||0)/100;
+
+  const start=(base==null)?null:Number(base);
+  const rows=[];
+  if(start==null) return {horizon, rows, gLow,gBase,gHigh,shock};
+  const s0=start;
+  rows.push({ano:0, baixo:s0, base:s0, alto:s0});
+  let pLow=s0*(1+shock), pBase=s0*(1+shock), pHigh=s0*(1+shock);
+  const dashMax = Math.max(...getDashYears(), 0);
+  const maxYears = Math.max(horizon, 30, dashMax);
+  for(let ano=1; ano<=maxYears; ano++){ // gera até 30 anos (e mais se precisar)
+    pLow = pLow*(1+gLow);
+    pBase = pBase*(1+gBase);
+    pHigh = pHigh*(1+gHigh);
+    rows.push({ano, baixo:pLow, base:pBase, alto:pHigh});
+  }
+  return {horizon, rows, gLow,gBase,gHigh,shock};
+}
+
+function getDashYears(){
+  const ys=[
+    parseInt(parseBR(getv("dash.y1","1")) ?? 1,10),
+    parseInt(parseBR(getv("dash.y2","2")) ?? 2,10),
+    parseInt(parseBR(getv("dash.y3","5")) ?? 5,10),
+    parseInt(parseBR(getv("dash.y4","10")) ?? 10,10),
+    parseInt(parseBR(getv("dash.y5","15")) ?? 15,10),
+  ].map(v=>Number.isFinite(v)?Math.max(0,Math.floor(v)):0);
+  const out=[];
+  ys.forEach(y=>{ if(!out.includes(y)) out.push(y); });
+  return out;
+}
+
+function renderBASE(){
+  const main=document.getElementById("main");
+  main.innerHTML="";
+  main.appendChild(hero("BASE_TABELAS", "Lista completa de ruas (com busca). Toque em uma rua para preencher o INPUT_IMOVEL automaticamente."));
+  const c=card("Ruas", streets.length+" registros");
+  const g=document.createElement("div"); g.className="fields";
+  g.appendChild(fieldText("Buscar rua", "base.search", "Ex.: Pontal", "BASE_TABELAS"));
+  c.body.appendChild(g);
+
+  const q=norm(getv("base.search",""));
+  let items=streets;
+  if(q) items=streets.filter(s=>norm(s.rua).includes(q));
+
+  const wrap=document.createElement("div"); wrap.className="table";
+  const tbl=document.createElement("table");
+  tbl.innerHTML="<thead><tr><th>Rua</th><th class='mono'>Fator Loc</th><th class='mono'>R$/m²</th></tr></thead><tbody></tbody>";
+  const tb=tbl.querySelector("tbody");
+  items.slice(0,280).forEach(s=>{
+    const tr=document.createElement("tr");
+    tr.style.cursor="pointer";
+    tr.innerHTML="<td>"+escapeHtml(s.rua)+"</td><td class='mono'>"+(s.fator??"")+"</td><td class='mono'>"+(s.valor_m2??"")+"</td>";
+    tr.onclick=()=>{ setv("imovel.rua", s.rua); state.tab="INPUT_IMOVEL"; saveLocal(); showToast("Rua selecionada: "+s.rua); render(); };
+    tb.appendChild(tr);
+  });
+  wrap.appendChild(tbl);
+  c.body.appendChild(wrap);
+  main.appendChild(c.c);
+}
+
+function renderINPUT(){
+  const main=document.getElementById("main");
+  main.innerHTML="";
+  main.appendChild(hero("INPUT_IMOVEL", "Inputs numéricos não travam. Campos financeiros formatam em moeda (BRL) ao sair do campo."));
+
+  const a=card("Cadastro do imóvel", "Aba INPUT_IMOVEL");
+  const grid=document.createElement("div"); grid.className="fields";
+  grid.appendChild(fieldDatalist("Rua (Matinhos-PR)", "imovel.rua", "ruasList", "Digite para buscar…", "B4"));
+  grid.appendChild(fieldText("Área do terreno (m²)", "imovel.area_terreno", "Ex.: 375", "B5", {inputmode:"decimal", format:"num"}));
+  grid.appendChild(fieldText("Área construída Ae (m²)", "imovel.area_construida", "Ex.: 0", "B6", {inputmode:"decimal", format:"num"}));
+  grid.appendChild(fieldDatalist("Uso", "imovel.uso", "usoList", "Digite para buscar…", "B7"));
+  grid.appendChild(fieldDatalist("Estrutura", "imovel.estrutura", "estruturaList", "Digite para buscar…", "B8"));
+  grid.appendChild(fieldDatalist("Estado de conservação", "imovel.estado", "estadoList", "Digite para buscar…", "B9"));
+  grid.appendChild(fieldDatalist("Fator de zoneamento (nº)", "imovel.zone", "zoneList", "Digite para buscar…", "B10", {inputmode:"numeric"}));
+  grid.appendChild(fieldText("K manual (opcional)", "imovel.k_manual", "Ex.: 29", "B11", {inputmode:"decimal", format:"num"}));
+  grid.appendChild(fieldText("Preço de mercado observado (opcional)", "imovel.preco_obs", "Ex.: R$ 300.000,00", "B12", {inputmode:"decimal", format:"money"}));
+  a.body.appendChild(grid);
+
+  const row=document.createElement("div"); row.className="btnrow";
+  row.innerHTML='<button class="btn warn" id="clearInput">Limpar tudo (INPUT)</button>';
+  a.body.appendChild(row);
+
+  const hint=document.createElement("div");
+  hint.className="helper"; hint.id="hint";
+  a.body.appendChild(hint);
+
+  const b=card("Campos automáticos (Excel)", "Calculado automaticamente");
+  const out=document.createElement("div"); out.className="grid3";
+  out.appendChild(fieldOut("Fator de zoneamento (nº)", "o_zone", ""));
+  out.appendChild(fieldOut("Fator de localização", "o_fatorLoc", ""));
+  out.appendChild(fieldOut("Valor terreno (R$/m²)", "o_valorM2", ""));
+  out.appendChild(fieldOut("Venal do terreno (R$)", "o_venalTerr", ""));
+  out.appendChild(fieldOut("Vu (R$/m²)", "o_vu", ""));
+  out.appendChild(fieldOut("Fo", "o_fo", ""));
+  out.appendChild(fieldOut("Fz", "o_fz", ""));
+  out.appendChild(fieldOut("VVE edificação (R$)", "o_vve", ""));
+  out.appendChild(fieldOut("Venal Total (R$)", "o_venalTotal", ""));
+  out.appendChild(fieldOut("K usado", "o_k", ""));
+  out.appendChild(fieldOut("Valor de Mercado estimado (R$)", "o_mercado", ""));
+  out.appendChild(fieldOut("Diferença vs observado (R$)", "o_dif", ""));
+  out.appendChild(fieldOut("Diferença vs observado (%)", "o_difpct", ""));
+  b.body.appendChild(out);
+
+  const wrap=document.createElement("div"); wrap.className="cards";
+  wrap.appendChild(a.c); wrap.appendChild(b.c);
+  main.appendChild(wrap);
+  setTimeout(()=>{ const bb=document.getElementById("clearInput"); if(bb) bb.onclick=resetInputImovel; },0);
+  recalc();
+}
+
+function renderCOMPS(){
+  const main=document.getElementById("main");
+  main.innerHTML="";
+  main.appendChild(hero("MERCADO_COMPS", "Cadastre comparáveis e calcule o K (= Mercado ÷ Venal). Você pode aplicar a média/mediana como K manual do imóvel."));
+
+  const stats=card("Resumo dos comparáveis", state.comps.length+" registros");
+  const ks=[];
+  state.comps.forEach(c=>{
+    const r=computeComp(c);
+    if(r.k!=null && Number.isFinite(r.k)) ks.push(r.k);
+  });
+  const avg=ks.length? (ks.reduce((a,b)=>a+b,0)/ks.length) : null;
+  const med=ks.length? (()=>{ const s=[...ks].sort((a,b)=>a-b); const m=Math.floor(s.length/2); return s.length%2? s[m] : (s[m-1]+s[m])/2; })() : null;
+
+  const out=document.createElement("div"); out.className="grid3";
+  out.appendChild(ro("K médio", avg!=null?num2(avg):"—"));
+  out.appendChild(ro("K mediano", med!=null?num2(med):"—"));
+  out.appendChild(ro("Qtd. K válidos", ks.length?String(ks.length):"0"));
+  stats.body.appendChild(out);
+
+  const br=document.createElement("div"); br.className="btnrow";
+  br.innerHTML='<button class="btn primary" id="useAvg">Usar K médio no imóvel</button><button class="btn" id="useMed">Usar K mediano no imóvel</button><button class="btn warn" id="addComp">Adicionar comparável</button>';
+  stats.body.appendChild(br);
+  main.appendChild(stats.c);
+
+  setTimeout(()=>{
+    const setK=(v)=>{ if(v==null) return showToast("Sem K válido para aplicar."); setv("imovel.k_manual", String(v)); showToast("K manual aplicado: "+num2(v)); };
+    document.getElementById("useAvg").onclick=()=>setK(avg);
+    document.getElementById("useMed").onclick=()=>setK(med);
+    document.getElementById("addComp").onclick=()=>{
+      const nextId = (state.comps.reduce((m,x)=>Math.max(m, Number(x.id)||0), 0) || 0) + 1;
+      state.comps.push({id:nextId, rua:"", area_terreno:null, area_construida:null, uso:"", estrutura:"", estado:"", zone:"", preco:null});
+      saveLocal(); showToast("Comparável "+nextId+" adicionado."); render();
+    };
+  },0);
+
+  const table=card("Tabela (editável)", "Aba MERCADO_COMPS");
+  const wrap=document.createElement("div"); wrap.className="table";
+  const tbl=document.createElement("table");
+  tbl.innerHTML="<thead><tr>"+
+    "<th>ID</th><th>Rua</th><th class='mono'>Fator</th><th class='mono'>R$/m²</th>"+
+    "<th class='mono'>Área Terr.</th><th class='mono'>Área Const.</th>"+
+    "<th>Uso</th><th>Estrutura</th><th>Estado</th><th class='mono'>Fz (nº)</th>"+
+    "<th class='mono'>Preço (R$)</th><th class='mono'>Venal Tot.</th><th class='mono'>K</th><th></th>"+
+    "</tr></thead><tbody></tbody>";
+  const tb=tbl.querySelector("tbody");
+
+  function cellInput(value, onBlur, opts={}){
+    const inp=document.createElement("input");
+    inp.className="inp"; inp.style.height="36px"; inp.style.borderRadius="12px"; inp.style.fontSize="12px";
+    inp.value=(value==null)?"":String(value);
+    if(opts.list) inp.setAttribute("list", opts.list);
+    if(opts.placeholder) inp.placeholder=opts.placeholder;
+    inp.addEventListener("blur", ()=>{ onBlur(inp.value, inp); });
+    return inp;
+  }
+
+  state.comps.forEach((c, idx)=>{
+    const r=computeComp(c);
+    const tr=document.createElement("tr");
+
+    const tdId=document.createElement("td"); tdId.className="mono"; tdId.textContent=String(c.id??(idx+1)); tr.appendChild(tdId);
+
+    const tdRua=document.createElement("td");
+    const ruaInp=cellInput(c.rua, (v)=>{ c.rua=v; saveLocal(); render(); }, {list:"ruasList", placeholder:"Digite…"});
+    tdRua.appendChild(ruaInp); tr.appendChild(tdRua);
+
+    const tdF=document.createElement("td"); tdF.className="mono"; tdF.textContent=(r.fatorLoc??""); tr.appendChild(tdF);
+    const tdV=document.createElement("td"); tdV.className="mono"; tdV.textContent=(r.valorM2!=null?money(r.valorM2):""); tr.appendChild(tdV);
+
+    const tdAt=document.createElement("td");
+    tdAt.appendChild(cellInput(c.area_terreno, (v)=>{ c.area_terreno=parseBR(v); saveLocal(); render(); }, {placeholder:"m²"}));
+    tr.appendChild(tdAt);
+
+    const tdAc=document.createElement("td");
+    tdAc.appendChild(cellInput(c.area_construida, (v)=>{ c.area_construida=parseBR(v); saveLocal(); render(); }, {placeholder:"m²"}));
+    tr.appendChild(tdAc);
+
+    const tdUso=document.createElement("td");
+    tdUso.appendChild(cellInput(c.uso, (v)=>{ c.uso=v; saveLocal(); render(); }, {list:"usoList"}));
+    tr.appendChild(tdUso);
+
+    const tdEstr=document.createElement("td");
+    tdEstr.appendChild(cellInput(c.estrutura, (v)=>{ c.estrutura=v; saveLocal(); render(); }, {list:"estruturaList"}));
+    tr.appendChild(tdEstr);
+
+    const tdEst=document.createElement("td");
+    tdEst.appendChild(cellInput(c.estado, (v)=>{ c.estado=v; saveLocal(); render(); }, {list:"estadoList"}));
+    tr.appendChild(tdEst);
+
+    const tdZ=document.createElement("td");
+    tdZ.appendChild(cellInput(c.zone, (v)=>{ c.zone=v; saveLocal(); render(); }, {list:"zoneList"}));
+    tr.appendChild(tdZ);
+
+    const tdPreco=document.createElement("td");
+    tdPreco.appendChild(cellInput(c.preco!=null?money(c.preco):"", (v,el)=>{ const n=parseBR(v); c.preco=n; el.value=(n==null)?"":money(n); saveLocal(); render(); }, {placeholder:"R$"}));
+    tr.appendChild(tdPreco);
+
+    const tdVen=document.createElement("td"); tdVen.className="mono"; tdVen.textContent=(r.venalTotal!=null?money(r.venalTotal):""); tr.appendChild(tdVen);
+
+    const tdK=document.createElement("td"); tdK.className="mono"; tdK.textContent=(r.k!=null?num2(r.k):""); tr.appendChild(tdK);
+
+    const tdDel=document.createElement("td");
+    const del=document.createElement("button"); del.className="btn bad"; del.textContent="Remover";
+    del.style.padding="8px 10px"; del.style.borderRadius="12px"; del.style.fontSize="11px";
+    del.onclick=()=>{ state.comps.splice(idx,1); saveLocal(); showToast("Comparável removido."); render(); };
+    tdDel.appendChild(del);
+    tr.appendChild(tdDel);
+
+    tb.appendChild(tr);
+  });
+
+  wrap.appendChild(tbl);
+  table.body.appendChild(wrap);
+  main.appendChild(table.c);
+}
+
+function renderK(){
+  const main=document.getElementById("main");
+  main.innerHTML="";
+  main.appendChild(hero("CALIBRACAO_K", "K base vem de CALIBRACAO_K (coluna F) usando o fator de localização inteiro. K manual (se preenchido) tem prioridade."));
+  const c=computeImovel();
+  const a=card("K do imóvel", c.rua||"—");
+  const out=document.createElement("div"); out.className="grid3";
+  out.appendChild(ro("Fator de localização", c.fatorLoc!=null?String(c.fatorLoc):"—"));
+  out.appendChild(ro("K base", c.kBase!=null?num2(c.kBase):"—"));
+  out.appendChild(ro("K manual", (parseBR(getv("imovel.k_manual",""))!=null)?num2(parseBR(getv("imovel.k_manual",""))):"—"));
+  out.appendChild(ro("K usado", c.kUsado!=null?num2(c.kUsado):"—"));
+  a.body.appendChild(out);
+  main.appendChild(a.c);
+}
+
+function renderVALUATION(){
+  const main=document.getElementById("main");
+  main.innerHTML="";
+  main.appendChild(hero("VALUATION_ATUAL", "Resultado final: Venal total × K usado."));
+  const c=computeImovel();
+  const a=card("Resultado", c.rua||"—");
+  const out=document.createElement("div"); out.className="grid3";
+  out.appendChild(ro("Venal Total", c.venalTotal!=null?money(c.venalTotal):"—"));
+  out.appendChild(ro("K usado", c.kUsado!=null?num2(c.kUsado):"—"));
+  out.appendChild(ro("Mercado estimado", c.mercadoEst!=null?money(c.mercadoEst):"—"));
+  out.appendChild(ro("Diferença (R$)", c.dif!=null?money(c.dif):"—"));
+  out.appendChild(ro("Diferença (%)", c.difPct!=null?pct(c.difPct):"—"));
+  a.body.appendChild(out);
+  main.appendChild(a.c);
+}
+
+function renderPREM(){
+  const main=document.getElementById("main");
+  main.innerHTML="";
+  main.appendChild(hero("PREMISSAS", "Premissas para PROJECAO. Crescimentos em % ao ano. Choque é aplicado antes do Ano 1."));
+  const a=card("Premissas (editáveis)", "Aba PREMISSAS");
+  const grid=document.createElement("div"); grid.className="fields";
+  grid.appendChild(fieldText("Horizonte (anos)", "prem.horizon", "Ex.: 3", "B5", {inputmode:"numeric", format:"num"}));
+  grid.appendChild(fieldText("Crescimento anual — BAIXO (%)", "prem.low", "Ex.: 3", "B6", {inputmode:"decimal", format:"num"}));
+  grid.appendChild(fieldText("Crescimento anual — BASE (%)", "prem.base", "Ex.: 10", "B7", {inputmode:"decimal", format:"num"}));
+  grid.appendChild(fieldText("Crescimento anual — ALTO (%)", "prem.high", "Ex.: 9", "B8", {inputmode:"decimal", format:"num"}));
+  grid.appendChild(fieldText("Choque inicial Ano 1 (%)", "prem.shock", "Ex.: 0", "B9", {inputmode:"decimal", format:"num"}));
+  a.body.appendChild(grid);
+  const h=document.createElement("div"); h.className="helper";
+  h.textContent="Dica: após ajustar premissas, vá em PROJECAO para ver a tabela atualizada.";
+  a.body.appendChild(h);
+  main.appendChild(a.c);
+}
+
+function renderPROJ_TABLE(host){
+  host.innerHTML="";
+  const c=computeImovel();
+  const p=projectionSeries();
+  const horizon=30;
+
+  const badge = (txt, cls)=>'<span class="badge '+cls+'">'+txt+'</span>';
+  const meta=document.createElement("div"); meta.className="helper";
+  meta.innerHTML = (c.mercadoEst==null)
+    ? badge("Preencha o INPUT_IMOVEL para gerar projeções", "warn")
+    : badge("Base atual: "+money(c.mercadoEst)+" • horizonte: "+horizon+" anos", "ok");
+  host.appendChild(meta);
+
+  if(c.mercadoEst==null) return;
+
+  const wrap=document.createElement("div"); wrap.className="table";
+  const tbl=document.createElement("table");
+  tbl.innerHTML="<thead><tr><th class='mono'>Ano</th><th class='mono'>Valor BAIXO</th><th class='mono'>Valor BASE</th><th class='mono'>Valor ALTO</th></tr></thead><tbody></tbody>";
+  const tb=tbl.querySelector("tbody");
+  p.rows.slice(0, 31).forEach(r=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML="<td class='mono'>"+r.ano+"</td><td class='mono'>"+money(r.baixo)+"</td><td class='mono'>"+money(r.base)+"</td><td class='mono'>"+money(r.alto)+"</td>";
+    tb.appendChild(tr);
+  });
+  wrap.appendChild(tbl);
+  host.appendChild(wrap);
+}
+
+function renderPROJ(){
+  const main=document.getElementById("main");
+  main.innerHTML="";
+  main.appendChild(hero("PROJECAO", "Valor de mercado ao longo do tempo (Baixo/Base/Alto) com base no valor estimado atual."));
+  const a=card("Tabela de projeção", "Aba PROJECAO");
+  const hook=document.createElement("div"); hook.id="projHook";
+  a.body.appendChild(hook);
+  main.appendChild(a.c);
+  renderPROJ_TABLE(hook);
+}
+
+function renderDASH_TABLE(host){
+  host.innerHTML="";
+  const c=computeImovel();
+  const p=projectionSeries();
+  if(c.mercadoEst==null){
+    const d=document.createElement("div"); d.className="helper";
+    d.innerHTML='<span class="badge warn">Preencha o INPUT_IMOVEL para ver o dashboard.</span>';
+    host.appendChild(d); return;
+  }
+  const years=getDashYears();
+  const byYear=new Map(p.rows.map(r=>[r.ano,r]));
+  const wrap=document.createElement("div"); wrap.className="table";
+  const tbl=document.createElement("table");
+  tbl.innerHTML="<thead><tr><th class='mono'>Ano</th><th class='mono'>Baixo</th><th class='mono'>A.H</th><th class='mono'>Base</th><th class='mono'>A.H</th><th class='mono'>Alto</th><th class='mono'>A.H</th></tr></thead><tbody></tbody>";
+  const tb=tbl.querySelector("tbody");
+  years.forEach(y=>{
+    const r=byYear.get(y);
+    if(!r) return;
+    const ahLow=(r.baixo/c.mercadoEst)-1;
+    const ahBase=(r.base/c.mercadoEst)-1;
+    const ahHigh=(r.alto/c.mercadoEst)-1;
+    const tr=document.createElement("tr");
+    tr.innerHTML="<td class='mono'>"+y+"</td>"+
+      "<td class='mono'>"+money(r.baixo)+"</td><td class='mono'>"+pct(ahLow)+"</td>"+
+      "<td class='mono'>"+money(r.base)+"</td><td class='mono'>"+pct(ahBase)+"</td>"+
+      "<td class='mono'>"+money(r.alto)+"</td><td class='mono'>"+pct(ahHigh)+"</td>";
+    tb.appendChild(tr);
+  });
+  wrap.appendChild(tbl);
+  host.appendChild(wrap);
+}
+
+function yearPickField(label, key, placeholder){
+  const w=document.createElement("div");
+  w.className="field";
+  w.innerHTML='<div class="label"><span>'+escapeHtml(label)+'</span></div>';
+  const i=document.createElement("input");
+  i.className="inp";
+  i.readOnly=true;
+  i.value=getv(key,"");
+  i.placeholder=placeholder||"Toque para escolher";
+  i.setAttribute("data-pick", key);
+  i.style.cursor="pointer";
+  i.onclick=()=>openYearPicker(key, label);
+  w.appendChild(i);
+  return w;
+}
+
+function renderDASH(){
+  const main=document.getElementById("main");
+  main.innerHTML="";
+  main.appendChild(hero("DASHBOARD", "Resumo rápido do imóvel e comparação das projeções (anos escolhidos por você)."));
+  const c=computeImovel();
+
+  const a=card("Principais", "Aba DASHBOARD");
+  a.c.classList.add("dashSticky");
+  const out=document.createElement("div"); out.className="grid3";
+  out.appendChild(ro("Rua", c.rua||"—"));
+  out.appendChild(ro("Venal total", c.venalTotal!=null?money(c.venalTotal):"—"));
+  out.appendChild(ro("K usado", c.kUsado!=null?num2(c.kUsado):"—"));
+  out.appendChild(ro("Mercado estimado", c.mercadoEst!=null?money(c.mercadoEst):"—"));
+  out.appendChild(ro("Crescimento BASE a.a.", (parseBR(getv("prem.base",""))!=null)?(num2(parseBR(getv("prem.base",""))/100)): "—"));
+  a.body.appendChild(out);
+
+  const b=card("Compara PROJEÇÕES", "Escolha 5 anos (1–30)");
+  const right=document.createElement("div"); right.className="dashRightBody";
+
+  const yrs=document.createElement("div"); yrs.className="fields";
+  yrs.appendChild(yearPickField("Ano 1", "dash.y1", "Toque (1–30)"));
+  yrs.appendChild(yearPickField("Ano 2", "dash.y2", "Toque (1–30)"));
+  yrs.appendChild(yearPickField("Ano 3", "dash.y3", "Toque (1–30)"));
+  yrs.appendChild(yearPickField("Ano 4", "dash.y4", "Toque (1–30)"));
+  yrs.appendChild(yearPickField("Ano 5", "dash.y5", "Toque (1–30)"));
+  const hY=document.createElement("div"); hY.className="helper";
+  hY.textContent="Toque em cada campo para escolher o ano (1 a 30).";
+  right.appendChild(yrs);
+  right.appendChild(hY);
+
+  const scroll=document.createElement("div"); scroll.className="dashRightScroll";
+  const hook=document.createElement("div"); hook.id="dashHook";
+  scroll.appendChild(hook);
+  right.appendChild(scroll);
+
+  b.body.appendChild(right);
+
+  const grid=document.createElement("div"); grid.className="dashGrid";
+  grid.appendChild(a.c);
+  grid.appendChild(b.c);
+  main.appendChild(grid);
+
+  renderDASH_TABLE(hook);
+}
+
+function render(){
+  setSubtitle(); renderDrawer(); renderStepper(); renderBottom();
+  if(state.tab==="BASE_TABELAS") return renderBASE();
+  if(state.tab==="INPUT_IMOVEL") return renderINPUT();
+  if(state.tab==="MERCADO_COMPS") return renderCOMPS();
+  if(state.tab==="CALIBRACAO_K") return renderK();
+  if(state.tab==="VALUATION_ATUAL") return renderVALUATION();
+  if(state.tab==="PREMISSAS") return renderPREM();
+  if(state.tab==="PROJECAO") return renderPROJ();
+  if(state.tab==="DASHBOARD") return renderDASH();
+}
+
+document.getElementById("openMenu").onclick=()=>openDrawer(true);
+document.getElementById("closeMenu").onclick=()=>openDrawer(false);
+document.getElementById("backdrop").onclick=()=>openDrawer(false);
+
+document.getElementById("sheetClose").onclick=closeYearPicker;
+document.getElementById("sheetBack").onclick=closeYearPicker;
+
+render();
+</script>
+</body>
+</html>
